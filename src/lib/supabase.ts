@@ -2,32 +2,39 @@ import 'react-native-url-polyfill/auto';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
-import { AppState, Platform } from 'react-native';
 
 import type { Database } from '../../types/database.types';
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing EXPO_PUBLIC_SUPABASE_URL or EXPO_PUBLIC_SUPABASE_ANON_KEY');
-}
+export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    storage: AsyncStorage,
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: false,
+const authStorage = {
+  getItem: (key: string) => {
+    if (typeof window === 'undefined') return Promise.resolve(null);
+    return AsyncStorage.getItem(key);
   },
-});
+  setItem: (key: string, value: string) => {
+    if (typeof window === 'undefined') return Promise.resolve();
+    return AsyncStorage.setItem(key, value);
+  },
+  removeItem: (key: string) => {
+    if (typeof window === 'undefined') return Promise.resolve();
+    return AsyncStorage.removeItem(key);
+  },
+};
 
-if (Platform.OS !== 'web') {
-  AppState.addEventListener('change', (state) => {
-    if (state === 'active') {
-      void supabase.auth.startAutoRefresh();
-    } else {
-      void supabase.auth.stopAutoRefresh();
-    }
-  });
-}
+export const supabase = createClient<Database>(
+  supabaseUrl || 'https://placeholder.supabase.co',
+  supabaseAnonKey || 'placeholder-anon-key',
+  {
+    auth: {
+      storage: authStorage,
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: false,
+    },
+  },
+);
+

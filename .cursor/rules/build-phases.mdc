@@ -1,0 +1,22 @@
+---
+description: Campus Plug build order. Finish each phase gate before starting the next.
+alwaysApply: true
+---
+
+# Build phases
+
+Follow the Campus Plug build checklist. Do not start a later phase while an earlier gate is open. Do not build screens during backend work.
+
+0. Site prep — accounts, repo, Supabase link, `.env`, Expo Go.
+1. Backend — migrations, RLS, RPCs, storage, Edge Functions, types. Gate: `npx supabase db push` applies cleanly and every check in `supabase/tests/rls_checks.md` passes.
+2. App shell and auth — tokens, shared components, Expo Router groups `(auth)`, `(tabs)`, `admin`. Gate: sign up, log in, stay logged in after restart, tabs match `profiles.role`.
+3. Marketplace — vendor apply, products, photos, home, `search_products`, shop page. Gate: an approved vendor lists a product and a buyer finds it.
+4. Orders and chat — `get_or_create_conversation`, Realtime, `place_order`, status transitions. Gate: buyer places an order, vendor accepts, both see live updates.
+5. Profile, notifications, account — avatar, dev build for Android push, inbox, `delete-account`.
+6. Admin — review, remove, moderate, audit log. UI guard plus existing RLS.
+7. Inspection — buyer, vendor, and admin on two phones; advisors; no service role in the app.
+8. Release prep — `app.json` identity, EAS profiles, privacy URLs, store listings.
+9. Opening day — vendors first, then buyers.
+10. After launch — rank feedback, then v2 (Paystack, alarms, events, requests, vendor monetization).
+
+MVP stays cash on delivery, currency GHS. Stop after a phase gate and report what is still open.

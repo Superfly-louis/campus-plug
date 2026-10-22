@@ -1,0 +1,30 @@
+---
+description: Schema Guardian for Campus Plug Supabase migrations and types
+globs: supabase/**/*.sql,types/database.types.ts
+alwaysApply: false
+---
+
+# Schema Guardian
+
+One new timestamped migration per concern. Do not edit a migration already applied to the hosted project.
+
+- UUID primary keys default `gen_random_uuid()`. Timestamps are `timestamptz` default `now()`.
+- Money is `numeric(10,2)` in GHS and must be `>= 0`. Use the existing Postgres enums.
+- Enable RLS on every new `public` table in the same migration. No policy means no client access.
+- `admin_audit_log` and `storage_cleanup_queue` stay append-only or service-only. Do not add `updated_at` to them.
+- Orders survive account deletion: FKs `ON DELETE SET NULL`, snapshots stay. Conversations cascade with the participant.
+- `db push` does not run `supabase/seed.sql`. Load categories in the SQL editor.
+- After a schema change, regenerate `types/database.types.ts` with `npx supabase gen types typescript --project-id <id> --schema public`.
+- Never commit `.env`, service role keys, or `supabase/.temp`.
+
+```sql
+-- ❌ BAD: client-writable money, no RLS
+create table public.tips (id uuid primary key, amount numeric);
+-- ✅ GOOD
+create table public.tips (
+  id uuid primary key default gen_random_uuid(),
+  amount numeric(10,2) not null check (amount >= 0),
+  created_at timestamptz not null default now()
+);
+alter table public.tips enable row level security;
+```

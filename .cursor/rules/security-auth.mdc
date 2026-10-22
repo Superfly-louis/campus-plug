@@ -1,0 +1,24 @@
+---
+description: Security and auth review for Campus Plug access control
+globs: supabase/**/*.sql,supabase/functions/**/*.ts,src/**/*auth*,src/lib/supabase.ts
+alwaysApply: false
+---
+
+# Security and auth
+
+Authorization reads `public.profiles.role` only. Never read `user_metadata` or `raw_user_meta_data` for a role. Signup metadata may supply `full_name` only.
+
+- `security definer` functions set `search_path = ''`, schema-qualify every name, `revoke execute from public`, then grant only the roles that need them.
+- Clients cannot insert orders, notifications, or non-text messages. Order and vendor writes go through the existing RPCs.
+- Column grants, not extra RLS, limit profile and vendor updates. Clients cannot update `profiles.role`.
+- Storage object names start with `{auth.uid()}/`. Public buckets are for image URLs, not a policy that lists every file.
+- The app uses the anon key only. `SUPABASE_SERVICE_ROLE_KEY` stays in Edge Function secrets.
+- Instant push is the `notifications` insert trigger plus Vault. Do not add a Dashboard webhook on that table, or each insert sends twice.
+- `delete-account` deletes Storage files first, then the auth user. It trusts the JWT, not a user id in the body.
+
+```sql
+-- ❌ BAD
+if (auth.jwt() -> 'user_metadata' ->> 'role') = 'admin' then
+-- ✅ GOOD
+if public.is_admin() then
+```

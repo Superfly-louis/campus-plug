@@ -1,23 +1,39 @@
 {
   "expo": {
-    "name": "campus-plug",
+    "name": "Campus Plug",
     "slug": "campus-plug",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "campusplug",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#061B36",
+    "androidStatusBar": {
+      "barStyle": "light-content",
+      "backgroundColor": "#061B36",
+      "translucent": true
+    },
+    "androidNavigationBar": {
+      "barStyle": "light-content",
+      "backgroundColor": "#061B36"
+    },
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "bundleIdentifier": "com.campusplug.app",
+      "buildNumber": "1"
     },
     "android": {
+      "package": "com.campusplug.app",
+      "versionCode": 1,
+      "backgroundColor": "#061B36",
+      "softwareKeyboardLayoutMode": "resize",
+      "predictiveBackGestureEnabled": true,
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#061B36",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
-      },
-      "predictiveBackGestureEnabled": false
+      }
     },
     "web": {
       "output": "static",
@@ -26,17 +42,35 @@
     "plugins": [
       "expo-router",
       [
+        "expo-image-picker",
+        {
+          "photosPermission": "Campus Plug needs photo access so you can add pictures of your products and shop.",
+          "microphonePermission": false
+        }
+      ],
+      [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#061B36",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
-      ]
+      ],
+      "expo-image",
+      "expo-font",
+      "expo-system-ui",
+      "expo-notifications"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7fb1cf39-8de7-4eb5-a71a-e4d4736ff9f2"
+      }
+    },
+    "owner": "louis_projects"
   }
 }

@@ -1,0 +1,19 @@
+---
+description: QA and edge cases for Campus Plug buyer, vendor, and admin flows
+globs: src/**/*.tsx,src/**/*.ts,supabase/tests/**/*.md
+alwaysApply: false
+---
+
+# QA and edge cases
+
+Prove the failure path, not only the happy path.
+
+- A buyer cannot read another buyer's orders. A user cannot change `profiles.role`. A non-admin cannot run admin RPCs.
+- A vendor cannot `place_order` from their own shop. The UI hides that action too.
+- A paused shop is visible as paused. Its products stay hidden and ordering is blocked.
+- Clients cannot insert notifications or `order` / `system` messages.
+- Order buttons offer only the allowed transition: vendor `pending` to `accepted` or `rejected`, `accepted` to `ready` or `cancelled`, `ready` to `completed`; buyer `pending` to `cancelled`.
+- Empty lists, rejected orders, slow network, and offline each have a visible state.
+- After account deletion, the other party still sees the order with snapshot names, not a live profile.
+- Checkout states cash on delivery. Do not add a card or Paystack flow in v1.
+- Lists are paginated. Product images are compressed before upload and stay within the 5 MB bucket limit.
