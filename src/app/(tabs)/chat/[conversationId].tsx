@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { FlatList, Pressable, Text, View } from 'react-native';
 
 import { ChatBubble } from '@/components/chat/ChatBubble';
+import { receiptState } from '@/components/chat/ReceiptMarks';
 import { ThreadState } from '@/components/chat/ChatListState';
 import { MessageComposer } from '@/components/chat/MessageComposer';
 import { OrderMessageCard } from '@/components/chat/OrderMessageCard';
@@ -17,6 +18,7 @@ import { useConversationRealtime, useMessages, useSendMessage } from '@/hooks/qu
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import type { ChatMessage } from '@/lib/api/messages';
 import { useAuth } from '@/lib/auth';
+import { useOnline } from '@/lib/presence';
 import { formatDayLabel, formatTime } from '@/lib/format';
 
 function param(value: string | string[] | undefined): string {
@@ -57,6 +59,8 @@ export default function ChatScreen() {
   useMarkConversationReadWhenFocused(conversationId, newestId);
 
   const summary = conversations.data?.find((row) => row.id === conversationId);
+  const counterpartId = summary ? (summary.role === 'buyer' ? summary.vendorUserId : summary.buyerId) : '';
+  const online = useOnline(counterpartId);
   const name = summary ? (summary.counterpartName?.trim() ? summary.counterpartName : 'Deleted user') : 'Chat';
   const isBuyer = summary?.role === 'buyer' && Boolean(summary.vendorId);
   const rows = threadRows(messages);
@@ -79,19 +83,24 @@ export default function ChatScreen() {
       <View style={{ flex: 1, paddingHorizontal: layout.screenPadding, gap: spacing.sm }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
           <IconButton accessibilityLabel="Go back" name="chevron-left" onPress={() => router.back()} />
-          {summary ? <Avatar name={name} uri={summary.counterpartImageUrl} /> : null}
+          {summary ? <Avatar name={name} online={online} uri={summary.counterpartImageUrl} /> : null}
           <View style={{ flex: 1, minWidth: 0, gap: spacing.xxs }}>
             <Text numberOfLines={1} style={typography.bodyMedium}>
               {unavailable ? 'Chat unavailable' : name}
             </Text>
-            {isBuyer && summary ? (
-              <Pressable
-                accessibilityRole="link"
-                accessibilityLabel={`View ${name}`}
-                onPress={() => router.push({ pathname: '/shop/[id]', params: { id: summary.vendorId } })}
-              >
-                <Text style={[typography.caption, { color: colors.lilac }]}>View shop</Text>
-              </Pressable>
+            {online || (isBuyer && summary) ? (
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+                {online ? <Text style={[typography.caption, { color: colors.primary }]}>Online</Text> : null}
+                {isBuyer && summary ? (
+                  <Pressable
+                    accessibilityRole="link"
+                    accessibilityLabel={`View ${name}`}
+                    onPress={() => router.push({ pathname: '/shop/[id]', params: { id: summary.vendorId } })}
+                  >
+                    <Text style={[typography.caption, { color: colors.lilac }]}>View shop</Text>
+                  </Pressable>
+                ) : null}
+              </View>
             ) : null}
           </View>
         </View>
@@ -121,7 +130,12 @@ export default function ChatScreen() {
           <FlatList
             inverted
             contentInsetAdjustmentBehavior="never"
-            contentContainerStyle={{ gap: spacing.sm, paddingVertical: spacing.sm }}
+            contentContainerStyle={{
+              flexGrow: 1,
+              justifyContent: 'flex-end',
+              gap: spacing.sm,
+              paddingVertical: spacing.sm,
+            }}
             data={rows}
             keyExtractor={(item) => item.key}
             keyboardShouldPersistTaps="handled"
@@ -131,7 +145,7 @@ export default function ChatScreen() {
             }}
             onEndReachedThreshold={0.3}
             ListFooterComponent={
-              thread.isFetchingNextPage ? <Text style={[typography.caption, { textAlign: 'center' }]}>Loading earlier messages…</Text> : null
+              thread.isFetchingNextPage ? <Text style={[typography.caption, { textAlign: 'center' }]}>Loading earlier messages…</Text> : undefined
             }
             renderItem={({ item }) => {
               if (item.kind === 'day') return <DateSeparator label={item.label} />;
@@ -158,6 +172,11 @@ export default function ChatScreen() {
                       : undefined
                   }
                   pending={message.delivery === 'pending'}
+                  receipt={
+                    mine && message.delivery !== 'pending' && message.delivery !== 'failed'
+                      ? receiptState(message.read_at != null, online)
+                      : null
+                  }
                   time={formatTime(message.created_at)}
                 />
               );

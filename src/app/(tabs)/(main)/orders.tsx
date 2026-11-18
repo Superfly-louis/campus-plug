@@ -7,6 +7,7 @@ import { OrderCard } from '@/components/orders/OrderCard';
 import { OrderListState } from '@/components/orders/OrderListState';
 import { SegmentedControl } from '@/components/orders/SegmentedControl';
 import { PageHero } from '@/components/ui/PageHero';
+import { RefreshSpinner } from '@/components/ui/RefreshSpinner';
 import { Screen } from '@/components/ui/Screen';
 import { useTabBarInset } from '@/components/ui/TabBar';
 import { ShellHeader } from '@/components/ui/ShellHeader';
@@ -45,7 +46,7 @@ export default function OrdersScreen() {
   return (
     <Screen>
       <FlatList contentInsetAdjustmentBehavior="automatic"
-        contentContainerStyle={{ flexGrow: 1, gap: spacing.sm, paddingBottom: spacing.xl + tabInset }}
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: spacing.xl + tabInset }}
         data={showRows ? rows : []}
         keyExtractor={(item) => item.id}
         style={{ flex: 1 }}
@@ -53,16 +54,19 @@ export default function OrdersScreen() {
           if (orders.hasNextPage && !orders.isFetchingNextPage) void orders.fetchNextPage();
         }}
         onEndReachedThreshold={0.4}
-        onRefresh={() => {
-          void orders.refetch();
-        }}
-        refreshing={orders.isRefetching && !orders.isFetchingNextPage}
+        refreshControl={
+          <RefreshSpinner
+            onRefresh={() => {
+              void orders.refetch();
+            }}
+            refreshing={orders.isRefetching && !orders.isFetchingNextPage}
+          />
+        }
         ListHeaderComponent={
-          <View style={{ gap: spacing.lg, marginBottom: spacing.sm }}>
-            <ShellHeader variant="orders" />
+          <View style={{ gap: spacing.sm, marginBottom: spacing.sm }}>
             <PageHero
+              actions={<ShellHeader actionsOnly variant="orders" />}
               highlight="Orders"
-              subtitle="Track your purchases, manage your orders and stay updated."
               title="Your Orders"
             />
             {approved ? (
@@ -92,7 +96,7 @@ export default function OrdersScreen() {
             {null}
           </OrderListState>
         }
-        ListFooterComponent={orders.isFetchingNextPage ? <Skeleton height={spacing.huge} rounded="lg" /> : null}
+        ListFooterComponent={orders.isFetchingNextPage ? <Skeleton height={spacing.huge} rounded="lg" /> : undefined}
         renderItem={({ item }) => (
           <OrderCard
             onPress={() => router.push({ pathname: '/order/[id]', params: { id: item.id } })}

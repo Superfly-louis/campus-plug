@@ -8,6 +8,10 @@ export const unstable_settings = {
 
 export default function AuthLayout() {
   return (
-    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }} />
+    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
+      <Stack.Screen name="sign-in" options={{ contentStyle: { backgroundColor: colors.paper } }} />
+      <Stack.Screen name="sign-up" options={{ contentStyle: { backgroundColor: colors.paper } }} />
+      <Stack.Screen name="verify-email" options={{ contentStyle: { backgroundColor: colors.paper } }} />
+    </Stack>
   );
 }

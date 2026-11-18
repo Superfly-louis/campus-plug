@@ -1,6 +1,7 @@
 import { Pressable, Text, View } from 'react-native';
 
-import { colors, layout, radius, spacing, typography } from '@/constants/theme';
+import { ReceiptMarks, type ReceiptState } from '@/components/chat/ReceiptMarks';
+import { colors, radius, spacing, typography } from '@/constants/theme';
 
 type ChatBubbleProps = {
   body: string;
@@ -8,26 +9,34 @@ type ChatBubbleProps = {
   mine: boolean;
   pending?: boolean;
   failed?: boolean;
+  receipt?: ReceiptState | null;
   onRetry?: () => void;
 };
 
-export function ChatBubble({ body, time, mine, pending = false, failed = false, onRetry }: ChatBubbleProps) {
+export function ChatBubble({ body, time, mine, pending = false, failed = false, receipt = null, onRetry }: ChatBubbleProps) {
   return (
     <View style={{ alignItems: mine ? 'flex-end' : 'flex-start', gap: spacing.xxs }}>
       <View
         style={{
-          maxWidth: '80%',
+          maxWidth: '82%',
           paddingHorizontal: spacing.md,
-          paddingVertical: spacing.sm,
-          borderRadius: radius.lg,
-          backgroundColor: mine ? colors.violet : colors.surface,
-          borderWidth: mine ? 0 : layout.borderWidth,
-          borderColor: colors.border,
+          paddingTop: spacing.sm,
+          paddingBottom: spacing.xs,
+          borderTopLeftRadius: radius.lg,
+          borderTopRightRadius: radius.lg,
+          borderBottomLeftRadius: mine ? radius.lg : radius.sm,
+          borderBottomRightRadius: mine ? radius.sm : radius.lg,
+          backgroundColor: mine ? colors.violet : colors.surfaceAlt,
         }}
       >
         <Text style={[typography.body, { color: colors.textPrimary }]}>{body}</Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: spacing.xxs, marginTop: spacing.xxs }}>
+          <Text style={[typography.caption, { color: mine ? colors.lilac : colors.textMuted }]}>
+            {pending ? 'Sending' : time}
+          </Text>
+          {mine && receipt ? <ReceiptMarks state={receipt} /> : null}
+        </View>
       </View>
-      <Text style={typography.caption}>{pending ? 'Sending…' : time}</Text>
       {failed && onRetry ? (
         <Pressable accessibilityRole="button" accessibilityLabel="Retry message" onPress={onRetry}>
           <Text style={[typography.caption, { color: colors.danger }]}>Tap to retry</Text>

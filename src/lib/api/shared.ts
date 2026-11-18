@@ -1,7 +1,11 @@
 import { supabase } from '@/lib/supabase';
 
-export function raiseIfError(error: { message: string } | null): void {
-  if (error) throw error;
+export function raiseIfError(error: { message: string; details?: string | null; hint?: string | null } | null): void {
+  if (!error) return;
+  const parts = [error.message, error.details, error.hint].filter(
+    (part): part is string => typeof part === 'string' && part.trim().length > 0,
+  );
+  throw new Error(parts.join(' ') || 'That request failed. Try again.');
 }
 
 export function requireData<T>(data: T | null): T {

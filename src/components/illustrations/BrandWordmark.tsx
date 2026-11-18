@@ -1,21 +1,30 @@
-import { Text, View } from 'react-native';
+import { Image } from 'expo-image';
+import { View } from 'react-native';
 
-import { Icon } from '@/components/ui/Icon';
-import { colors, icon, spacing, typography } from '@/constants/theme';
+const source = require('@/assets/illustrations/logo-lockup.png');
+const aspect = 1;
 
-export function BrandWordmark() {
+type BrandWordmarkProps = {
+  tone?: 'dark' | 'paper';
+  width?: number;
+};
+
+export function BrandWordmark({ tone = 'dark', width }: BrandWordmarkProps) {
+  const onPaper = tone === 'paper';
+  const size = width ?? (onPaper ? 210 : 148);
+
   return (
     <View
       accessibilityRole="header"
       accessibilityLabel="Campus Plug"
-      style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xxs }}
+      style={{ alignSelf: onPaper ? 'center' : 'flex-start' }}
     >
-      <Text style={typography.wordmark}>
-        Campus<Text style={{ color: colors.primary }}>Plug</Text>
-      </Text>
-      <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-        <Icon name="zap" size={icon.sm} color="primary" />
-      </View>
+      <Image
+        accessible={false}
+        contentFit="contain"
+        source={source}
+        style={{ width: size, height: Math.round(size / aspect) }}
+      />
     </View>
   );
 }

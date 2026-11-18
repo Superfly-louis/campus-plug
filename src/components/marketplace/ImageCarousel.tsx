@@ -74,7 +74,7 @@ export function ImageCarousel({ images, accessibilityLabel = 'Product photos' }:
                 width: dot === index ? spacing.xl : spacing.xs,
                 height: spacing.xs,
                 borderRadius: radius.pill,
-                backgroundColor: dot === index ? colors.primary : colors.textMuted,
+                backgroundColor: colors.primary,
               }}
             />
           ))}

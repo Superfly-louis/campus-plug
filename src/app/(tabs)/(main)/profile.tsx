@@ -7,6 +7,7 @@ import { Avatar } from '@/components/ui/Avatar';
 import { Card } from '@/components/ui/Card';
 import { Icon } from '@/components/ui/Icon';
 import { ListRow } from '@/components/ui/ListRow';
+import { PageHero } from '@/components/ui/PageHero';
 import { Screen } from '@/components/ui/Screen';
 import { ShellHeader } from '@/components/ui/ShellHeader';
 import { StatTile } from '@/components/ui/StatTile';
@@ -49,7 +50,12 @@ export default function ProfileScreen() {
 
   return (
     <Screen scroll>
-      <ShellHeader variant="profile" />
+      <PageHero
+        actions={<ShellHeader actionsOnly variant="profile" />}
+        highlight="Profile"
+        subtitle="Manage your account, orders, and messages."
+        title="Your Profile"
+      />
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
         <Avatar name={name} size="lg" uri={getImageUrl('avatars', profile?.avatar_url)} />
         <View style={{ flex: 1, gap: spacing.xs }}>

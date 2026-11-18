@@ -34,6 +34,27 @@ export const colors = {
   info: violetHex,
   primarySoft: withAlpha(primaryHex, 0.18),
   overlay: withAlpha(black, 0.55),
+  paper: '#FFFFFF',
+  ink: '#3B1578',
+  inkMuted: '#5C5670',
+  dot: '#D5D0DE',
+} as const;
+
+export const promoCard = {
+  navy: '#071B36',
+  blue: '#102A50',
+  purple: '#792BFF',
+  lavender: '#B66AFF',
+  lime: '#B7FF32',
+  white: '#FFFFFF',
+  mist: '#E9DCFF',
+  gradientStart: '#120830',
+  gradientEnd: '#4B18B0',
+  wave: '#6414E0',
+  waveSoft: '#8B4DFF',
+  border: '#7C4DFF',
+  frame: '#F4EEFF',
+  labelFill: withAlpha('#B66AFF', 0.28),
 } as const;
 
 export const spacing = {
@@ -217,8 +238,6 @@ export const limits = {
   passwordMin: 8,
   nameMin: 2,
   nameMax: 60,
-  campusMin: 2,
-  campusMax: 80,
   otpMin: 6,
   otpMax: 10,
   phoneSubscriberDigits: 9,
@@ -252,8 +271,7 @@ export const limits = {
 } as const;
 
 export const marketplace = {
-  categoryTileWidth: 112,
-  categoryTileHeight: 60,
+  categoryTileHeight: 48,
   vendorCardWidth: 220,
   coverHeight: 128,
   productImageHeight: 148,

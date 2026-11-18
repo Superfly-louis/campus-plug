@@ -4,7 +4,12 @@ import { useIsFocused } from 'expo-router';
 import { useCallback, useEffect } from 'react';
 
 import { useAuth } from '@/lib/auth';
-import { listConversations, markConversationRead, openConversation } from '@/lib/api/conversations';
+import {
+  listConversations,
+  markConversationRead,
+  openConversation,
+  type ConversationSummary,
+} from '@/lib/api/conversations';
 
 import { queryKeys } from '@/hooks/queries/keys';
 import { useRealtimeActive, useRealtimeChannel } from '@/hooks/realtime/useRealtimeChannel';
@@ -34,20 +39,24 @@ const readDebounceMs = 500;
 export function useMarkConversationReadWhenFocused(conversationId: string, newestMessageId: string) {
   const queryClient = useQueryClient();
   const focused = useIsFocused();
-  const { mutate } = useMutation({
-    mutationFn: (id: string) => markConversationRead(id),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: queryKeys.conversations.all });
-    },
-  });
+  const { session } = useAuth();
+  const userId = session?.user.id ?? '';
 
   useEffect(() => {
-    if (!focused || conversationId.length === 0) return;
+    if (!focused || conversationId.length === 0 || userId.length === 0) return;
+    const listKey = queryKeys.conversations.list(userId);
     const timer = setTimeout(() => {
-      mutate(conversationId);
+      void markConversationRead(conversationId)
+        .then(() => {
+          queryClient.setQueryData<ConversationSummary[]>(listKey, (current) =>
+            current?.map((row) => (row.id === conversationId ? { ...row, unreadCount: 0 } : row)),
+          );
+          return queryClient.invalidateQueries({ queryKey: queryKeys.conversations.all });
+        })
+        .catch(() => undefined);
     }, readDebounceMs);
     return () => clearTimeout(timer);
-  }, [conversationId, focused, mutate, newestMessageId]);
+  }, [conversationId, focused, newestMessageId, queryClient, userId]);
 }
 
 export function useConversationsRealtime(): void {

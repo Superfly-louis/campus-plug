@@ -1,4 +1,4 @@
-import { ScrollView } from 'react-native';
+import { HorizontalScroll } from '@/components/ui/HorizontalScroll';
 
 import { Chip } from '@/components/ui/Chip';
 import type { OrderListFilter } from '@/constants/orderStatus';
@@ -20,7 +20,7 @@ type FilterChipsProps = {
 
 export function FilterChips({ value, onChange }: FilterChipsProps) {
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.xs }}>
+    <HorizontalScroll contentContainerStyle={{ gap: spacing.xs }}>
       {chips.map((chip) => (
         <Chip
           active={chip.value === value}
@@ -29,6 +29,6 @@ export function FilterChips({ value, onChange }: FilterChipsProps) {
           onPress={() => onChange(chip.value)}
         />
       ))}
-    </ScrollView>
+    </HorizontalScroll>
   );
 }

@@ -1,9 +1,8 @@
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 
-import { BrandWordmark } from '@/components/illustrations/BrandWordmark';
 import { Avatar } from '@/components/ui/Avatar';
 import { IconButton } from '@/components/ui/IconButton';
-import { colors, layout, spacing, typography } from '@/constants/theme';
+import { layout, spacing } from '@/constants/theme';
 
 export type AppHeaderVariant = 'home' | 'explore' | 'orders' | 'profile';
 
@@ -15,23 +14,8 @@ type AppHeaderProps = {
   onBellPress?: () => void;
   onAvatarPress?: () => void;
   onSettingsPress?: () => void;
-  onSearchPress?: () => void;
+  actionsOnly?: boolean;
 };
-
-const tagline = ['Buy', 'Sell', 'Support Local'] as const;
-
-function Tagline() {
-  return (
-    <Text style={typography.caption} numberOfLines={1}>
-      {tagline.map((part, index) => (
-        <Text key={part}>
-          {index > 0 ? <Text style={{ color: colors.lilac }}> • </Text> : null}
-          <Text style={{ color: colors.textMuted }}>{part}</Text>
-        </Text>
-      ))}
-    </Text>
-  );
-}
 
 export function AppHeader({
   variant,
@@ -41,10 +25,21 @@ export function AppHeader({
   onBellPress,
   onAvatarPress,
   onSettingsPress,
-  onSearchPress,
+  actionsOnly = false,
 }: AppHeaderProps) {
   const bellLabel = unread ? 'Notifications, unread' : 'Notifications';
   const showAvatar = variant === 'home' || variant === 'orders';
+  const actions = (
+    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <IconButton name="bell" accessibilityLabel={bellLabel} onPress={onBellPress} dot={unread} />
+      {showAvatar ? <Avatar name={name} uri={avatarUrl} onPress={onAvatarPress} /> : null}
+      {variant === 'profile' ? (
+        <IconButton name="settings" accessibilityLabel="Settings" onPress={onSettingsPress} />
+      ) : null}
+    </View>
+  );
+
+  if (actionsOnly) return actions;
 
   return (
     <View
@@ -52,24 +47,11 @@ export function AppHeader({
         minHeight: layout.minTouchTarget,
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-end',
         gap: spacing.sm,
       }}
     >
-      <View style={{ flex: 1, gap: spacing.xxs }}>
-        <BrandWordmark />
-        {variant === 'home' ? <Tagline /> : null}
-      </View>
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        {variant === 'explore' ? (
-          <IconButton name="search" accessibilityLabel="Search" onPress={onSearchPress} />
-        ) : null}
-        <IconButton name="bell" accessibilityLabel={bellLabel} onPress={onBellPress} dot={unread} />
-        {showAvatar ? <Avatar name={name} uri={avatarUrl} onPress={onAvatarPress} /> : null}
-        {variant === 'profile' ? (
-          <IconButton name="settings" accessibilityLabel="Settings" onPress={onSettingsPress} />
-        ) : null}
-      </View>
+      {actions}
     </View>
   );
 }

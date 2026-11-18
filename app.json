@@ -13,10 +13,6 @@
       "backgroundColor": "#061B36",
       "translucent": true
     },
-    "androidNavigationBar": {
-      "barStyle": "light-content",
-      "backgroundColor": "#061B36"
-    },
     "ios": {
       "icon": "./assets/expo.icon",
       "bundleIdentifier": "com.campusplug.app",
@@ -59,6 +55,13 @@
       "expo-image",
       "expo-font",
       "expo-system-ui",
+      [
+        "expo-navigation-bar",
+        {
+          "style": "dark",
+          "enforceContrast": false
+        }
+      ],
       "expo-notifications"
     ],
     "experiments": {

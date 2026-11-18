@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { CategoryRow } from '@/components/marketplace/CategoryRow';
 import { FeaturedCard } from '@/components/marketplace/FeaturedCard';
@@ -9,7 +9,9 @@ import { MiniProductCard, ProductCardSkeleton } from '@/components/marketplace/P
 import { PromoCarousel } from '@/components/marketplace/PromoCarousel';
 import { VendorCard, VendorCardSkeleton } from '@/components/marketplace/VendorCard';
 import { PageHero } from '@/components/ui/PageHero';
+import { HorizontalScroll } from '@/components/ui/HorizontalScroll';
 import { Screen } from '@/components/ui/Screen';
+import { SearchBar } from '@/components/ui/SearchBar';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { ShellHeader } from '@/components/ui/ShellHeader';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -36,6 +38,10 @@ function openShop(id: string) {
 
 function openProduct(id: string) {
   router.push({ pathname: '/product/[id]', params: { id } });
+}
+
+function openSearch(slug: string) {
+  router.push({ pathname: '/search', params: slug ? { category: slug } : {} });
 }
 
 export default function ExploreScreen() {
@@ -76,14 +82,27 @@ export default function ExploreScreen() {
       refreshing={refreshing}
       scroll
     >
-      <ShellHeader variant="explore" />
-      <PageHero
-        highlight2="Campus"
-        illustration="hero-pin"
-        subtitle="Find food, fashion, services and more from trusted vendors and fellow students."
-        title="Explore"
-        titleLine2="What's Around Campus"
-      />
+      <View style={{ gap: spacing.sm }}>
+        <PageHero
+          actions={<ShellHeader actionsOnly variant="explore" />}
+          title={selected ? categoryVisual(selected.slug, selected.name).label : 'Explore'}
+        />
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Search campus"
+          onPress={() => openSearch(selected?.slug ?? '')}
+        >
+          <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" pointerEvents="none">
+            <SearchBar
+              onChangeText={() => undefined}
+              onSubmit={() => openSearch(selected?.slug ?? '')}
+              placeholder="Search campus"
+              readOnly
+              value=""
+            />
+          </View>
+        </Pressable>
+      </View>
       {categories.isPending ? (
         <Skeleton height={marketplace.categoryTileHeight} rounded="lg" />
       ) : categories.isError ? (
@@ -108,13 +127,13 @@ export default function ExploreScreen() {
         }}
         onStartSelling={() => sellEntry(vendor)}
       />
-      <SectionHeader title="New Vendors" />
+      <SectionHeader title="Shops" />
       {vendorsPending ? (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm }}>
+        <HorizontalScroll contentContainerStyle={{ gap: spacing.sm }}>
           {previewSkeletons.map((key) => (
             <VendorCardSkeleton key={key} />
           ))}
-        </ScrollView>
+        </HorizontalScroll>
       ) : vendorsError ? (
         <MarketplaceState
           message={toFriendlyError(home.error ?? vendorIds.error)}
@@ -132,7 +151,7 @@ export default function ExploreScreen() {
           title="No shops yet"
         />
       ) : (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm }}>
+        <HorizontalScroll contentContainerStyle={{ gap: spacing.sm }}>
           {vendorCards.map((vendor) => (
             <VendorCard
               categoryLabel={vendor.categoryLabel}
@@ -146,7 +165,7 @@ export default function ExploreScreen() {
               variant="explore"
             />
           ))}
-        </ScrollView>
+        </HorizontalScroll>
       )}
       {showFeatured && featuredCard ? (
         <FeaturedCard
@@ -161,21 +180,20 @@ export default function ExploreScreen() {
         />
       ) : null}
       <SectionHeader
-        icon="sparkles"
         onSeeAll={() =>
           router.push({
             pathname: '/search',
             params: selected ? { sort: 'newest', category: selected.slug } : { sort: 'newest' },
           })
         }
-        title="Just Listed"
+        title="Just in"
       />
       {listed.isPending ? (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm }}>
+        <HorizontalScroll contentContainerStyle={{ gap: spacing.sm }}>
           {previewSkeletons.map((key) => (
             <ProductCardSkeleton compact key={key} />
           ))}
-        </ScrollView>
+        </HorizontalScroll>
       ) : listed.isError ? (
         <MarketplaceState
           message={toFriendlyError(listed.error)}
@@ -192,7 +210,7 @@ export default function ExploreScreen() {
           title="Nothing listed yet"
         />
       ) : (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm }}>
+        <HorizontalScroll contentContainerStyle={{ gap: spacing.sm }}>
           {hits.map((hit) => {
             const match = categories.data?.find((item) => item.id === hit.categoryId);
             const visual = match ? categoryVisual(match.slug, match.name) : null;
@@ -209,7 +227,7 @@ export default function ExploreScreen() {
               />
             );
           })}
-        </ScrollView>
+        </HorizontalScroll>
       )}
     </Screen>
   );

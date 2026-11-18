@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { type ScrollViewInstance, View } from 'react-native';
 
 import { PromoBanner } from '@/components/marketplace/PromoBanner';
+import { HorizontalScroll } from '@/components/ui/HorizontalScroll';
 import { promos, type PromoAction } from '@/constants/promos';
-import { colors, marketplace, motion, radius, spacing } from '@/constants/theme';
+import { marketplace, motion, colors, radius, spacing } from '@/constants/theme';
 
 type PromoCarouselProps = {
   onExploreCategory: (slug: string) => void;
@@ -11,7 +12,7 @@ type PromoCarouselProps = {
 };
 
 export function PromoCarousel({ onExploreCategory, onStartSelling }: PromoCarouselProps) {
-  const scrollRef = useRef<ScrollView>(null);
+  const scrollRef = useRef<ScrollViewInstance>(null);
   const [width, setWidth] = useState(0);
   const [index, setIndex] = useState(0);
   const skipScroll = useRef(true);
@@ -46,11 +47,9 @@ export function PromoCarousel({ onExploreCategory, onStartSelling }: PromoCarous
         setWidth((current) => (current === next ? current : next));
       }}
     >
-      <ScrollView
+      <HorizontalScroll
         ref={scrollRef}
-        horizontal
         pagingEnabled
-        showsHorizontalScrollIndicator={false}
         onMomentumScrollEnd={(event) => {
           if (width <= 0) return;
           const next = Math.round(event.nativeEvent.contentOffset.x / width);
@@ -62,17 +61,17 @@ export function PromoCarousel({ onExploreCategory, onStartSelling }: PromoCarous
             <PromoBanner promo={promo} onPress={() => run(promo.action)} />
           </View>
         ))}
-      </ScrollView>
+      </HorizontalScroll>
       <View style={{ flexDirection: 'row', justifyContent: 'center', gap: spacing.xs, marginTop: spacing.sm }}>
         {promos.map((promo, dot) => (
           <View
             key={promo.id}
             accessibilityLabel={dot === index ? `Slide ${dot + 1}, current` : `Slide ${dot + 1}`}
             style={{
-              width: dot === index ? spacing.xl : spacing.xs,
-              height: spacing.xs,
+              width: dot === index ? spacing.lg : 6,
+              height: 6,
               borderRadius: radius.pill,
-              backgroundColor: dot === index ? colors.primary : colors.indigo,
+              backgroundColor: colors.primary,
             }}
           />
         ))}

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { isCampus } from '@/constants/campuses';
 import { limits, priceFractionDigits } from '@/constants/theme';
 
 const subscriber = limits.phoneSubscriberDigits;
@@ -37,8 +38,7 @@ export const phoneSchema = z
 export const campusLocationSchema = z
   .string()
   .trim()
-  .min(limits.campusMin, 'Enter your hall, hostel, or area.')
-  .max(limits.campusMax, `Use at most ${limits.campusMax} characters.`);
+  .refine(isCampus, 'Choose your campus.');
 
 export const otpSchema = z
   .string()

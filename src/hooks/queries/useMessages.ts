@@ -96,6 +96,20 @@ export function useConversationRealtime(conversationId: string): void {
           queryClient.setQueryData<ThreadData>(threadKey, (current) => mergeThreadMessage(current, incoming));
         },
       );
+      channel.on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'messages',
+          filter: `conversation_id=eq.${conversationId}`,
+        },
+        (payload) => {
+          const incoming = messageFromRealtime(payload.new);
+          if (!incoming || incoming.conversation_id !== conversationId) return;
+          queryClient.setQueryData<ThreadData>(threadKey, (current) => mergeThreadMessage(current, incoming));
+        },
+      );
     },
     [conversationId, queryClient, threadKey],
   );

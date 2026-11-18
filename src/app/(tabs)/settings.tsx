@@ -4,6 +4,7 @@ import { Alert, Text, View } from 'react-native';
 
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
+import { CampusChoices } from '@/components/ui/CampusChoices';
 import { IconButton } from '@/components/ui/IconButton';
 import { InlineError } from '@/components/ui/InlineError';
 import { Screen } from '@/components/ui/Screen';
@@ -120,13 +121,7 @@ export default function SettingsScreen() {
         onChangeText={edit(setPhone)}
         value={phone}
       />
-      <TextField
-        autoCapitalize="words"
-        label="Campus"
-        onChangeText={edit(setCampus)}
-        placeholder="Hall, hostel, or area"
-        value={campus}
-      />
+      <CampusChoices onChange={edit(setCampus)} value={campus} />
       {saved ? <Text style={[typography.body, { color: colors.success }]}>Profile saved.</Text> : null}
       {error ? <InlineError message={error} /> : null}
       <Button disabled={deleting} label="Save" loading={saving} onPress={() => void save()} />

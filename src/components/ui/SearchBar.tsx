@@ -26,7 +26,7 @@ export function SearchBar({
       style={{
         minHeight: control.buttonLg,
         paddingLeft: spacing.md,
-        paddingRight: spacing.xxs,
+        paddingRight: readOnly ? spacing.md : spacing.xxs,
         borderRadius: radius.pill,
         borderWidth: layout.borderWidth,
         borderColor: colors.border,
@@ -54,20 +54,7 @@ export function SearchBar({
           style={[typography.body, { flex: 1, paddingVertical: spacing.sm }]}
         />
       )}
-      {readOnly ? (
-        <View
-          style={{
-            width: layout.minTouchTarget,
-            height: layout.minTouchTarget,
-            borderRadius: radius.pill,
-            backgroundColor: colors.primary,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Icon name="arrow-right" size={icon.sm} color="textOnPrimary" />
-        </View>
-      ) : (
+      {readOnly ? null : (
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Search"

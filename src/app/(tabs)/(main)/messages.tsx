@@ -3,6 +3,7 @@ import { FlatList, Text } from 'react-native';
 
 import { ConversationListState } from '@/components/chat/ChatListState';
 import { ConversationRow } from '@/components/chat/ConversationRow';
+import { RefreshSpinner } from '@/components/ui/RefreshSpinner';
 import { Screen } from '@/components/ui/Screen';
 import { useTabBarInset } from '@/components/ui/TabBar';
 import { spacing, typography } from '@/constants/theme';
@@ -24,14 +25,18 @@ export default function MessagesScreen() {
   return (
     <Screen>
       <FlatList contentInsetAdjustmentBehavior="automatic"
-        contentContainerStyle={{ flexGrow: 1, gap: spacing.sm, paddingBottom: spacing.xl + tabInset }}
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: spacing.xl + tabInset }}
         data={showRows ? rows : []}
         keyExtractor={(item) => item.id}
         style={{ flex: 1 }}
-        onRefresh={() => {
-          void conversations.refetch();
-        }}
-        refreshing={conversations.isRefetching}
+        refreshControl={
+          <RefreshSpinner
+            onRefresh={() => {
+              void conversations.refetch();
+            }}
+            refreshing={conversations.isRefetching}
+          />
+        }
         ListHeaderComponent={
           <Text style={[typography.h1, { marginBottom: spacing.sm }]}>Messages</Text>
         }
@@ -49,10 +54,13 @@ export default function MessagesScreen() {
         }
         renderItem={({ item }) => (
           <ConversationRow
+            counterpartId={item.role === 'buyer' ? item.vendorUserId : item.buyerId}
             imageUrl={item.counterpartImageUrl}
             name={item.counterpartName ?? ''}
             onPress={() => router.push({ pathname: '/chat/[conversationId]', params: { conversationId: item.id } })}
             preview={item.preview}
+            previewMine={item.previewMine}
+            previewRead={item.previewRead}
             time={listTime(item.lastMessageAt)}
             unreadCount={item.unreadCount}
           />

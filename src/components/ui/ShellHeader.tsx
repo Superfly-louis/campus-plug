@@ -5,7 +5,13 @@ import { useUnreadCount } from '@/hooks/useUnreadCount';
 import { getImageUrl } from '@/lib/images';
 import { useAuth } from '@/lib/auth';
 
-export function ShellHeader({ variant }: { variant: AppHeaderVariant }) {
+export function ShellHeader({
+  variant,
+  actionsOnly = false,
+}: {
+  variant: AppHeaderVariant;
+  actionsOnly?: boolean;
+}) {
   const { profile } = useAuth();
   const unread = useUnreadCount();
 
@@ -15,8 +21,8 @@ export function ShellHeader({ variant }: { variant: AppHeaderVariant }) {
       name={profile?.full_name}
       onAvatarPress={() => router.push('/profile')}
       onBellPress={() => router.push('/notifications')}
-      onSearchPress={() => router.push('/search')}
       onSettingsPress={() => router.push('/settings')}
+      actionsOnly={actionsOnly}
       unread={unread > 0}
       variant={variant}
     />

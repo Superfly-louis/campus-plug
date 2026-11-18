@@ -61,6 +61,12 @@ export function toFriendlyError(error: unknown): string {
   if (code === 'over_request_rate_limit' || message.includes('rate limit')) {
     return rateLimit;
   }
+  if (message.includes('email address not authorized')) {
+    return 'Campus Plug cannot email that address yet.';
+  }
+  if (message.includes('redirect') && (message.includes('not allowed') || message.includes('invalid'))) {
+    return 'The email link is not set up yet. Try again after the app link is allowed.';
+  }
   if (code === '23505' || message.includes('vendors_owner_id')) {
     return 'You already have a shop application.';
   }
@@ -167,8 +173,18 @@ export function toFriendlyError(error: unknown): string {
 
   const issue = firstIssue(error);
   if (issue) return issue;
+  if (message.length > 0) {
+    const raw = readRaw(error, 'message');
+    return raw.length > 0 ? raw : message;
+  }
   if (error instanceof Error && error.message) return error.message;
   return unknown;
+}
+
+function readRaw(error: unknown, key: 'message'): string {
+  if (typeof error !== 'object' || error === null || !(key in error)) return '';
+  const value = (error as { message?: unknown }).message;
+  return typeof value === 'string' ? value : '';
 }
 
 export function isOrderStatusConflict(error: unknown): boolean {

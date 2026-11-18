@@ -1,3 +1,4 @@
+import { type ReactNode } from 'react';
 import { Text, View } from 'react-native';
 
 import { HighlightedTitle } from '@/components/HighlightedTitle';
@@ -9,8 +10,9 @@ type PageHeroProps = {
   highlight?: string;
   titleLine2?: string;
   highlight2?: string;
-  subtitle: string;
+  subtitle?: string;
   illustration?: IllustrationName;
+  actions?: ReactNode;
 };
 
 export function PageHero({
@@ -20,22 +22,51 @@ export function PageHero({
   highlight2,
   subtitle,
   illustration: illustrationName,
+  actions,
 }: PageHeroProps) {
+  const art = illustrationName ? (
+    <Illustration
+      name={illustrationName}
+      width={illustrationName === 'hero-pin' ? illustration.heroPin : illustration.heroAside}
+    />
+  ) : null;
+  const titleBlock = (
+    <View style={{ flex: 1, minWidth: 0, gap: illustrationName ? spacing.xs : 0 }}>
+      <HighlightedTitle highlight={highlight}>{title}</HighlightedTitle>
+      {titleLine2 ? <HighlightedTitle highlight={highlight2}>{titleLine2}</HighlightedTitle> : null}
+    </View>
+  );
+
   return (
     <View style={{ gap: spacing.xs }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-        <View style={{ flex: 1, minWidth: 0, gap: spacing.xs }}>
-          <HighlightedTitle highlight={highlight}>{title}</HighlightedTitle>
-          {titleLine2 ? <HighlightedTitle highlight={highlight2}>{titleLine2}</HighlightedTitle> : null}
+      {actions && art ? (
+        <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm }}>
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <HighlightedTitle highlight={highlight}>{title}</HighlightedTitle>
+            {titleLine2 ? <HighlightedTitle highlight={highlight2}>{titleLine2}</HighlightedTitle> : null}
+          </View>
+          <View style={{ alignItems: 'flex-end' }}>
+            {actions}
+            {art}
+          </View>
         </View>
-        {illustrationName ? (
-          <Illustration
-            name={illustrationName}
-            width={illustrationName === 'hero-pin' ? illustration.heroPin : illustration.heroAside}
-          />
-        ) : null}
-      </View>
-      <Text style={[typography.body, { color: colors.textMuted }]}>{subtitle}</Text>
+      ) : (
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+          {actions ? (
+            <View style={{ flex: 1, minWidth: 0 }}>
+              <HighlightedTitle highlight={highlight}>{title}</HighlightedTitle>
+            </View>
+          ) : (
+            titleBlock
+          )}
+          {actions}
+          {art}
+        </View>
+      )}
+      {actions && !art && titleLine2 ? (
+        <HighlightedTitle highlight={highlight2}>{titleLine2}</HighlightedTitle>
+      ) : null}
+      {subtitle ? <Text style={[typography.body, { color: colors.textMuted }]}>{subtitle}</Text> : null}
     </View>
   );
 }

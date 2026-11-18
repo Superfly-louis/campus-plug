@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { InlineError } from '@/components/ui/InlineError';
 import { Screen } from '@/components/ui/Screen';
 import { TextField } from '@/components/ui/TextField';
-import { colors, layout, typography } from '@/constants/theme';
+import { colors, layout, spacing, typography } from '@/constants/theme';
 import { useAuth } from '@/lib/auth';
 import { emailSchema, fieldError, fullNameSchema, passwordSchema } from '@/lib/validation';
 
@@ -49,50 +49,63 @@ export default function SignUpScreen() {
   };
 
   return (
-    <Screen scroll>
-      <BrandWordmark />
-      <HighlightedTitle highlight="Campus Plug">Join Campus Plug</HighlightedTitle>
-      <Text style={[typography.body, { color: colors.textMuted }]}>
-        Create your account with your campus email.
-      </Text>
-      {formError ? <InlineError message={formError} /> : null}
-      <TextField
-        autoCapitalize="words"
-        autoComplete="name"
-        error={nameError}
-        icon="user"
-        label="Full name"
-        onChangeText={setFullName}
-        textContentType="name"
-        value={fullName}
-      />
-      <TextField
-        autoComplete="email"
-        error={emailError}
-        icon="mail"
-        keyboardType="email-address"
-        label="Email"
-        onChangeText={setEmail}
-        placeholder="you@central.edu.gh"
-        textContentType="emailAddress"
-        value={email}
-      />
-      <TextField
-        autoComplete="password"
-        error={passwordError}
-        icon="lock"
-        label="Password"
-        onChangeText={setPassword}
-        secure
-        textContentType="newPassword"
-        value={password}
-      />
-      <Button label="Create account" loading={submitting} onPress={submit} />
-      <View style={{ flexDirection: 'row', alignItems: 'center', minHeight: layout.minTouchTarget }}>
-        <Text style={[typography.body, { color: colors.textMuted }]}>Already have an account? </Text>
-        <Pressable accessibilityRole="link" onPress={() => router.push('/sign-in')}>
-          <Text style={[typography.bodyMedium, { color: colors.lilac }]}>Sign in</Text>
-        </Pressable>
+    <Screen paper scroll>
+      <View style={{ alignItems: 'center', gap: spacing.sm }}>
+        <BrandWordmark tone="paper" width={148} />
+        <View style={{ alignSelf: 'stretch', gap: spacing.xxs }}>
+          <HighlightedTitle color={colors.ink} highlight="Campus Plug">
+            Join Campus Plug
+          </HighlightedTitle>
+          <Text style={[typography.body, { color: colors.inkMuted }]}>
+            Create your account with your campus email.
+          </Text>
+        </View>
+      </View>
+      <View style={{ gap: spacing.md }}>
+        {formError ? <InlineError message={formError} /> : null}
+        <TextField
+          autoCapitalize="words"
+          autoComplete="name"
+          error={nameError}
+          icon="user"
+          label="Full name"
+          onChangeText={setFullName}
+          textContentType="name"
+          tone="paper"
+          value={fullName}
+        />
+        <TextField
+          autoComplete="email"
+          error={emailError}
+          icon="mail"
+          keyboardType="email-address"
+          label="Email"
+          onChangeText={setEmail}
+          placeholder="you@central.edu.gh"
+          textContentType="emailAddress"
+          tone="paper"
+          value={email}
+        />
+        <TextField
+          autoComplete="password"
+          error={passwordError}
+          icon="lock"
+          label="Password"
+          onChangeText={setPassword}
+          secure
+          textContentType="newPassword"
+          tone="paper"
+          value={password}
+        />
+      </View>
+      <View style={{ gap: spacing.xs }}>
+        <Button label="Create account" loading={submitting} onPress={submit} />
+        <View style={{ flexDirection: 'row', alignItems: 'center', minHeight: layout.minTouchTarget }}>
+          <Text style={[typography.body, { color: colors.inkMuted }]}>Already have an account? </Text>
+          <Pressable accessibilityRole="link" onPress={() => router.push('/sign-in')}>
+            <Text style={[typography.bodyMedium, { color: colors.violet }]}>Sign in</Text>
+          </Pressable>
+        </View>
       </View>
     </Screen>
   );

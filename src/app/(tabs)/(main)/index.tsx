@@ -1,11 +1,12 @@
 import { router } from 'expo-router';
-import { Pressable, ScrollView, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { CategoryRow, type CategoryChoice } from '@/components/marketplace/CategoryRow';
 import { MarketplaceState } from '@/components/marketplace/MarketplaceState';
 import { PromoCarousel } from '@/components/marketplace/PromoCarousel';
 import { VendorCard, VendorCardSkeleton } from '@/components/marketplace/VendorCard';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { HorizontalScroll } from '@/components/ui/HorizontalScroll';
 import { PageHero } from '@/components/ui/PageHero';
 import { Screen } from '@/components/ui/Screen';
 import { SearchBar } from '@/components/ui/SearchBar';
@@ -30,7 +31,8 @@ function openCategory(slug: string) {
 }
 
 export default function HomeScreen() {
-  const { vendor } = useAuth();
+  const { profile, vendor } = useAuth();
+  const firstName = profile?.full_name?.trim().split(/\s+/)[0] ?? '';
   const categories = useCategories();
   const home = useHomeVendors();
   const refreshing =
@@ -45,18 +47,18 @@ export default function HomeScreen() {
       refreshing={refreshing}
       scroll
     >
-      <ShellHeader variant="home" />
-      <PageHero
-        highlight="campus"
-        illustration="hero-piggy"
-        subtitle="Find food, fashion, services and more from students and local vendors."
-        title="Discover what's happening on campus"
-      />
-      <Pressable accessibilityRole="button" accessibilityLabel="Search campus" onPress={openSearch}>
-        <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" pointerEvents="none">
-          <SearchBar onChangeText={() => undefined} onSubmit={openSearch} readOnly value="" />
-        </View>
-      </Pressable>
+      <View style={{ gap: spacing.sm }}>
+        <PageHero
+          actions={<ShellHeader actionsOnly variant="home" />}
+          highlight={firstName || undefined}
+          title={firstName ? `Hey, ${firstName}` : 'Home'}
+        />
+        <Pressable accessibilityRole="button" accessibilityLabel="Search campus" onPress={openSearch}>
+          <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" pointerEvents="none">
+            <SearchBar onChangeText={() => undefined} onSubmit={openSearch} placeholder="Search campus" readOnly value="" />
+          </View>
+        </Pressable>
+      </View>
       {categories.isPending ? (
         <Skeleton height={marketplace.categoryTileHeight} rounded="lg" />
       ) : categories.isError ? (
@@ -81,11 +83,11 @@ export default function HomeScreen() {
         title="Popular Vendors"
       />
       {home.isPending ? (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm }}>
+        <HorizontalScroll contentContainerStyle={{ gap: spacing.sm }}>
           {vendorSkeletons.map((key) => (
             <VendorCardSkeleton key={key} />
           ))}
-        </ScrollView>
+        </HorizontalScroll>
       ) : home.isError ? (
         <MarketplaceState
           message={toFriendlyError(home.error)}
@@ -103,7 +105,7 @@ export default function HomeScreen() {
           title="Nothing listed yet"
         />
       ) : (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm }}>
+        <HorizontalScroll contentContainerStyle={{ gap: spacing.sm }}>
           {home.cards.map((vendor) => (
             <VendorCard
               categoryLabel={vendor.categoryLabel}
@@ -116,7 +118,7 @@ export default function HomeScreen() {
               productCount={vendor.productCount}
             />
           ))}
-        </ScrollView>
+        </HorizontalScroll>
       )}
     </Screen>
   );

@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 
 import { ImageCarousel } from '@/components/marketplace/ImageCarousel';
 import { MarketplaceState } from '@/components/marketplace/MarketplaceState';
@@ -13,6 +13,7 @@ import { Icon } from '@/components/ui/Icon';
 import { IconButton } from '@/components/ui/IconButton';
 import { InlineError } from '@/components/ui/InlineError';
 import { Screen } from '@/components/ui/Screen';
+import { RefreshSpinner } from '@/components/ui/RefreshSpinner';
 import { categoryVisual } from '@/constants/categories';
 import { colors, layout, motion, radius, spacing, typography } from '@/constants/theme';
 import { useOpenConversation } from '@/hooks/queries/useConversations';
@@ -101,14 +102,11 @@ export default function ProductScreen() {
           contentInsetAdjustmentBehavior="never"
           contentContainerStyle={{ paddingBottom: spacing.xl }}
           refreshControl={
-            <RefreshControl
-              colors={[colors.primary]}
+            <RefreshSpinner
               onRefresh={() => {
                 void product.refetch();
               }}
-              progressBackgroundColor={colors.surface}
               refreshing={product.isRefetching}
-              tintColor={colors.primary}
             />
           }
         >

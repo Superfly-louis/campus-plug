@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { InlineError } from '@/components/ui/InlineError';
 import { Screen } from '@/components/ui/Screen';
+import { RefreshSpinner } from '@/components/ui/RefreshSpinner';
 import { useTabBarInset } from '@/components/ui/TabBar';
 import { categoryVisual } from '@/constants/categories';
 import { colors, layout, motion, radius, spacing, typography } from '@/constants/theme';
@@ -92,11 +93,15 @@ export default function ShopScreen() {
         data={listings}
         keyExtractor={(item) => item.product.id}
         numColumns={2}
-        onRefresh={() => {
-          void shop.refetch();
-          if (!paused) void products.refetch();
-        }}
-        refreshing={(shop.isRefetching || products.isRefetching) && !shop.isPending}
+        refreshControl={
+          <RefreshSpinner
+            onRefresh={() => {
+              void shop.refetch();
+              if (!paused) void products.refetch();
+            }}
+            refreshing={(shop.isRefetching || products.isRefetching) && !shop.isPending}
+          />
+        }
         renderItem={({ item }) => {
           const visual = item.category ? categoryVisual(item.category.slug, item.category.name) : null;
           const cover = item.images[0]?.storage_path;
@@ -152,7 +157,7 @@ export default function ShopScreen() {
           </View>
         }
         ListEmptyComponent={
-          paused ? null : products.isPending ? (
+          paused ? undefined : products.isPending ? (
             <View style={{ flexDirection: 'row', gap: spacing.sm }}>
               <View style={{ flex: 1 }}>
                 <ProductCardSkeleton />

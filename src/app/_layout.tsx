@@ -14,6 +14,9 @@ import { Screen } from '@/components/ui/Screen';
 import { colors, layout, query, spacing, typography } from '@/constants/theme';
 import { useAppFonts } from '@/hooks/useAppFonts';
 import { AuthProvider, useAuth } from '@/lib/auth';
+import { entryPath } from '@/lib/entry';
+import { IntroProvider, useIntro } from '@/lib/intro';
+import { PresenceProvider } from '@/lib/presence';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 
 SplashScreen.preventAutoHideAsync();
@@ -53,7 +56,9 @@ export default function RootLayout() {
 
   const app = isSupabaseConfigured ? (
     <AuthProvider>
-      <RootNavigator fontsReady={fontsReady} />
+      <PresenceProvider>
+        <RootNavigator fontsReady={fontsReady} />
+      </PresenceProvider>
     </AuthProvider>
   ) : (
     <SetupRequired fontsReady={fontsReady} />
@@ -61,7 +66,9 @@ export default function RootLayout() {
 
   return (
     <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>{app}</QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        <IntroProvider>{app}</IntroProvider>
+      </QueryClientProvider>
     </ErrorBoundary>
   );
 }
@@ -90,12 +97,20 @@ function SetupRequired({ fontsReady }: { fontsReady: boolean }) {
 function RootNavigator({ fontsReady }: { fontsReady: boolean }) {
   const { ready, session, profile, profileComplete, profileError, linkError, clearLinkError, recovery, refreshProfile, signOut } =
     useAuth();
+  const intro = useIntro();
 
   useEffect(() => {
-    if (fontsReady && ready) void SplashScreen.hideAsync();
-  }, [fontsReady, ready]);
+    if (fontsReady && ready && intro.seen !== null) void SplashScreen.hideAsync();
+  }, [fontsReady, ready, intro.seen]);
 
-  if (!fontsReady || !ready) return null;
+  if (!fontsReady || !ready || intro.seen === null) return null;
+
+  const entry = entryPath({
+    signedIn: Boolean(session),
+    recovery,
+    profileComplete,
+    introSeen: intro.seen,
+  });
 
   if (session && !profile) {
     return (
@@ -127,16 +142,19 @@ function RootNavigator({ fontsReady }: { fontsReady: boolean }) {
         </Pressable>
       ) : null}
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
-        <Stack.Protected guard={!session}>
+        <Stack.Protected guard={!recovery && intro.seen === false} redirectTo={entry}>
+          <Stack.Screen name="welcome" />
+        </Stack.Protected>
+        <Stack.Protected guard={!session && !recovery && intro.seen === true} redirectTo={entry}>
           <Stack.Screen name="(auth)" />
         </Stack.Protected>
-        <Stack.Protected guard={!session || recovery}>
+        <Stack.Protected guard={!session || recovery} redirectTo={entry}>
           <Stack.Screen name="reset-password" />
         </Stack.Protected>
-        <Stack.Protected guard={Boolean(session) && !recovery && !profileComplete}>
-          <Stack.Screen name="onboarding" />
+        <Stack.Protected guard={Boolean(session) && !recovery && intro.seen === true && !profileComplete} redirectTo={entry}>
+          <Stack.Screen name="onboarding" options={{ contentStyle: { backgroundColor: colors.paper } }} />
         </Stack.Protected>
-        <Stack.Protected guard={Boolean(session) && !recovery && profileComplete}>
+        <Stack.Protected guard={Boolean(session) && !recovery && intro.seen === true && profileComplete} redirectTo={entry}>
           <Stack.Screen name="(tabs)" />
         </Stack.Protected>
         <Stack.Screen name="+not-found" />

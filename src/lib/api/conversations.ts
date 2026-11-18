@@ -2,7 +2,7 @@ import { limits } from '@/constants/theme';
 import { getImageUrl } from '@/lib/images';
 import { supabase } from '@/lib/supabase';
 
-import { raiseIfError, requireData, requireUserId } from '@/lib/api/shared';
+import { raiseIfError, requireUserId } from '@/lib/api/shared';
 
 type ShopEmbed = {
   shop_name: string;
@@ -29,6 +29,8 @@ export type ConversationSummary = {
   counterpartImageUrl: string | null;
   counterpartKind: 'shop' | 'buyer';
   preview: string | null;
+  previewMine: boolean;
+  previewRead: boolean;
   unreadCount: number;
 };
 
@@ -76,14 +78,18 @@ export async function listConversations(): Promise<ConversationSummary[]> {
 
   const { data: recent, error: recentError } = await supabase
     .from('messages')
-    .select('conversation_id, body, created_at')
+    .select('conversation_id, body, created_at, sender_id, read_at')
     .order('created_at', { ascending: false })
     .limit(limits.conversationPreviewSample);
   raiseIfError(recentError);
-  const previewByConversation = new Map<string, string>();
+  const previewByConversation = new Map<string, { body: string; mine: boolean; read: boolean }>();
   for (const message of recent ?? []) {
     if (!previewByConversation.has(message.conversation_id)) {
-      previewByConversation.set(message.conversation_id, message.body);
+      previewByConversation.set(message.conversation_id, {
+        body: message.body,
+        mine: message.sender_id === userId,
+        read: message.read_at != null,
+      });
     }
   }
 
@@ -114,7 +120,9 @@ export async function listConversations(): Promise<ConversationSummary[]> {
         ? getImageUrl('shop-logos', shop?.logo_url)
         : getImageUrl('avatars', buyer?.avatar_url),
       counterpartKind: asShop ? 'shop' : 'buyer',
-      preview: previewByConversation.get(row.id) ?? null,
+      preview: previewByConversation.get(row.id)?.body ?? null,
+      previewMine: previewByConversation.get(row.id)?.mine ?? false,
+      previewRead: previewByConversation.get(row.id)?.read ?? false,
       unreadCount: unreadCount.get(row.id) ?? 0,
     };
   });
@@ -123,7 +131,18 @@ export async function listConversations(): Promise<ConversationSummary[]> {
 export async function openConversation(vendorId: string): Promise<string> {
   const { data, error } = await supabase.rpc('get_or_create_conversation', { vendor_id: vendorId });
   raiseIfError(error);
-  return requireData(data);
+  if (typeof data === 'string' && data.length > 0) return data;
+
+  const userId = await requireUserId();
+  const existing = await supabase
+    .from('conversations')
+    .select('id')
+    .eq('buyer_id', userId)
+    .eq('vendor_id', vendorId)
+    .maybeSingle();
+  raiseIfError(existing.error);
+  if (existing.data?.id) return existing.data.id;
+  throw new Error('The chat could not be opened.');
 }
 
 export async function markConversationRead(conversationId: string): Promise<void> {

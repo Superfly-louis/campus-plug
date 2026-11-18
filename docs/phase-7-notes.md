@@ -1,4 +1,4 @@
-# Phase 7 notes
+co# Phase 7 notes
 
 Inspection of the buyer, vendor, and admin paths, and a check that the service role stays off the phone. The code check is done. The two-phone walkthrough with advisors has not been run, so this gate stays open.
 

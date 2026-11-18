@@ -1,3 +1,5 @@
+import { isCampus } from '@/constants/campuses';
+
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function validateEmail(value: string): string | null {
@@ -23,7 +25,6 @@ export function validatePhone(value: string): string | null {
 }
 
 export function validateCampus(value: string): string | null {
-  const length = value.trim().length;
-  if (length < 1 || length > 120) return 'Enter your campus location.';
+  if (!isCampus(value.trim())) return 'Choose your campus.';
   return null;
 }

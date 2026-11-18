@@ -68,10 +68,12 @@ export default function VerifyEmailScreen() {
   };
 
   return (
-    <Screen scroll>
-      <BrandWordmark />
-      <HighlightedTitle highlight="email">Confirm your email</HighlightedTitle>
-      <Text style={[typography.body, { color: colors.textMuted }]}>Enter the code we sent to your email.</Text>
+    <Screen paper scroll>
+      <BrandWordmark tone="paper" />
+      <HighlightedTitle color={colors.ink} highlight="email">
+        Confirm your email
+      </HighlightedTitle>
+      <Text style={[typography.body, { color: colors.inkMuted }]}>Enter the code we sent to your email.</Text>
       {formError ? <InlineError message={formError} /> : null}
       <TextField
         error={codeError}
@@ -79,23 +81,31 @@ export default function VerifyEmailScreen() {
         label="Code"
         onChangeText={setCode}
         placeholder="123456"
+        tone="paper"
         value={code}
       />
       <Button label="Confirm" loading={submitting} onPress={submit} />
-      <Button
-        disabled={secondsLeft > 0 || !email}
-        fullWidth
-        label={secondsLeft > 0 ? `Resend in ${secondsLeft}s` : 'Resend code'}
-        loading={resending}
+      <Pressable
+        accessibilityRole="button"
+        accessibilityState={{ disabled: secondsLeft > 0 || !email || resending }}
+        disabled={secondsLeft > 0 || !email || resending}
         onPress={resend}
-        variant="ghost"
-      />
+        style={{
+          minHeight: layout.minTouchTarget,
+          justifyContent: 'center',
+          opacity: secondsLeft > 0 || !email ? motion.disabledOpacity : 1,
+        }}
+      >
+        <Text style={[typography.bodyMedium, { color: colors.violet }]}>
+          {secondsLeft > 0 ? `Resend in ${secondsLeft}s` : resending ? 'Sending…' : 'Resend code'}
+        </Text>
+      </Pressable>
       <Pressable
         accessibilityRole="link"
         onPress={() => router.push('/sign-in')}
         style={{ minHeight: layout.minTouchTarget, justifyContent: 'center' }}
       >
-        <Text style={[typography.bodyMedium, { color: colors.lilac }]}>Back to sign in</Text>
+        <Text style={[typography.bodyMedium, { color: colors.violet }]}>Back to sign in</Text>
       </Pressable>
     </Screen>
   );

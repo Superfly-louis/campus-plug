@@ -79,8 +79,20 @@ function pagesOf(current: ThreadData | undefined): ChatMessage[][] {
 export function mergeThreadMessage(current: ThreadData | undefined, incoming: ChatMessage, clientId?: string): ThreadData {
   const pages = pagesOf(current);
   const pageParams = current?.pageParams ?? [undefined];
-  if (pages.some((page) => page.some((message) => message.id === incoming.id))) {
-    return { pages, pageParams };
+  for (let pageIndex = 0; pageIndex < pages.length; pageIndex += 1) {
+    const existingIndex = pages[pageIndex].findIndex((message) => message.id === incoming.id);
+    if (existingIndex >= 0) {
+      const existing = pages[pageIndex][existingIndex];
+      if (!existing) return { pages, pageParams };
+      pages[pageIndex][existingIndex] = {
+        ...existing,
+        ...incoming,
+        clientId: existing.clientId,
+        delivery: existing.delivery,
+        read_at: incoming.read_at ?? existing.read_at,
+      };
+      return { pages, pageParams };
+    }
   }
 
   const matches = (message: ChatMessage) =>

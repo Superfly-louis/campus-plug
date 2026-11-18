@@ -208,7 +208,16 @@ function ProductEditor({
   const categoryLabel = selected ? categoryVisual(selected.slug, selected.name).label : 'Choose a category';
 
   useEffect(() => {
-    return navigation.addListener('beforeRemove', (event) => {
+    const nav = navigation as unknown as {
+      addListener: (
+        type: 'beforeRemove',
+        listener: (event: {
+          preventDefault: () => void;
+          data: { action: Parameters<typeof navigation.dispatch>[0] };
+        }) => void,
+      ) => () => void;
+    };
+    return nav.addListener('beforeRemove', (event) => {
       if (leave.current || (!saving && !dirty)) return;
       event.preventDefault();
       if (saving) {

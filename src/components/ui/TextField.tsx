@@ -13,6 +13,7 @@ type TextFieldProps = {
   secure?: boolean;
   helper?: string;
   error?: string;
+  tone?: 'dark' | 'paper';
   keyboardType?: TextInputProps['keyboardType'];
   autoCapitalize?: TextInputProps['autoCapitalize'];
   autoComplete?: TextInputProps['autoComplete'];
@@ -32,6 +33,7 @@ export function TextField({
   secure = false,
   helper,
   error,
+  tone = 'dark',
   keyboardType,
   autoCapitalize,
   autoComplete,
@@ -43,12 +45,18 @@ export function TextField({
 }: TextFieldProps) {
   const [focused, setFocused] = useState(false);
   const [hidden, setHidden] = useState(secure);
-  const borderColor = error ? colors.danger : focused ? colors.primary : colors.border;
+  const paper = tone === 'paper';
+  const borderColor = error ? colors.danger : focused ? (paper ? colors.violet : colors.primary) : paper ? colors.dot : colors.border;
   const hint = error ?? helper;
+  const iconColor = paper ? (focused ? 'violet' : 'inkMuted') : focused ? 'primary' : 'lilac';
 
   return (
     <View style={{ gap: spacing.xs }}>
-      {label ? <Text style={typography.bodyMedium}>{label}</Text> : null}
+      {label ? (
+        <Text style={[typography.bodyMedium, { color: tone === 'paper' ? colors.ink : colors.textPrimary }]}>
+          {label}
+        </Text>
+      ) : null}
       <View
         style={{
           minHeight: multiline ? spacing.huge * 2 : layout.minTouchTarget,
@@ -58,18 +66,21 @@ export function TextField({
           borderRadius: multiline ? radius.lg : radius.pill,
           borderWidth: layout.borderWidth,
           borderColor,
-          backgroundColor: colors.surfaceAlt,
+          backgroundColor: paper ? colors.paper : colors.surfaceAlt,
           flexDirection: 'row',
           alignItems: multiline ? 'flex-start' : 'center',
           gap: spacing.xs,
         }}
       >
-        {icon ? <Icon name={icon} size={iconSize.md} color={focused ? 'primary' : 'lilac'} /> : null}
+        {icon ? <Icon name={icon} size={iconSize.md} color={iconColor} /> : null}
         <TextInput
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor={colors.textMuted}
+          placeholderTextColor={paper ? colors.inkMuted : colors.textMuted}
+          cursorColor={paper ? colors.ink : colors.textPrimary}
+          keyboardAppearance={paper ? 'light' : 'dark'}
+          selectionColor={paper ? colors.violet : colors.primary}
           secureTextEntry={secure && hidden}
           keyboardType={keyboardType}
           autoCapitalize={autoCapitalize}
@@ -85,7 +96,7 @@ export function TextField({
           onBlur={() => setFocused(false)}
           accessibilityLabel={label ?? placeholder}
           accessibilityHint={hint}
-          style={[typography.body, { flex: 1, paddingVertical: spacing.sm }]}
+          style={[typography.body, { flex: 1, paddingVertical: spacing.sm, color: paper ? colors.ink : colors.textPrimary }]}
         />
         {secure ? (
           <Pressable
@@ -99,12 +110,14 @@ export function TextField({
               justifyContent: 'center',
             }}
           >
-            <Icon name={hidden ? 'eye' : 'eye-off'} color="lilac" />
+            <Icon name={hidden ? 'eye' : 'eye-off'} color={paper ? 'inkMuted' : 'lilac'} />
           </Pressable>
         ) : null}
       </View>
       {hint ? (
-        <Text style={[typography.caption, { color: error ? colors.danger : colors.textMuted }]}>{hint}</Text>
+        <Text style={[typography.caption, { color: error ? colors.danger : paper ? colors.inkMuted : colors.textMuted }]}>
+          {hint}
+        </Text>
       ) : null}
     </View>
   );

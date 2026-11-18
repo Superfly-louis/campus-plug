@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { Text } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { BrandWordmark } from '@/components/illustrations/BrandWordmark';
 import { HighlightedTitle } from '@/components/HighlightedTitle';
 import { Button } from '@/components/ui/Button';
+import { CampusChoices } from '@/components/ui/CampusChoices';
 import { InlineError } from '@/components/ui/InlineError';
 import { Screen } from '@/components/ui/Screen';
 import { TextField } from '@/components/ui/TextField';
-import { colors, typography } from '@/constants/theme';
+import { colors, layout, spacing, typography } from '@/constants/theme';
 import { useAuth } from '@/lib/auth';
 import { campusLocationSchema, fullNameSchema, phoneSchema } from '@/lib/validation';
 
@@ -58,45 +59,59 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <Screen scroll>
-      <BrandWordmark />
-      <HighlightedTitle highlight="profile">Set up your profile</HighlightedTitle>
-      <Text style={[typography.body, { color: colors.textMuted }]}>
-        Add your name, phone, and where you are on campus.
-      </Text>
-      {formError ? <InlineError message={formError} /> : null}
-      <TextField
-        autoCapitalize="words"
-        autoComplete="name"
-        error={nameError}
-        icon="user"
-        label="Full name"
-        onChangeText={setFullName}
-        textContentType="name"
-        value={fullName}
-      />
-      <TextField
-        autoComplete="tel"
-        error={phoneError}
-        icon="phone"
-        keyboardType="phone-pad"
-        label="Phone"
-        onChangeText={setPhone}
-        placeholder="0240000000"
-        textContentType="telephoneNumber"
-        value={phone}
-      />
-      <TextField
-        autoCapitalize="words"
-        error={campusError}
-        icon="map-pin"
-        label="Hall, hostel or area"
-        onChangeText={setCampus}
-        placeholder="Miotso"
-        value={campus}
-      />
-      <Button label="Continue" loading={submitting} onPress={submit} />
-      <Button disabled={signingOut} label="Log out" loading={signingOut} onPress={logOut} variant="ghost" />
+    <Screen paper scroll>
+      <View style={{ alignItems: 'center', gap: spacing.sm }}>
+        <BrandWordmark tone="paper" width={148} />
+        <View style={{ alignSelf: 'stretch', gap: spacing.xxs }}>
+          <HighlightedTitle color={colors.ink} highlight="profile">
+            Set up your profile
+          </HighlightedTitle>
+          <Text style={[typography.body, { color: colors.inkMuted }]}>
+            Add your name, phone, and campus.
+          </Text>
+        </View>
+      </View>
+      <View style={{ gap: spacing.md }}>
+        {formError ? <InlineError message={formError} /> : null}
+        <TextField
+          autoCapitalize="words"
+          autoComplete="name"
+          error={nameError}
+          icon="user"
+          label="Full name"
+          onChangeText={setFullName}
+          textContentType="name"
+          tone="paper"
+          value={fullName}
+        />
+        <TextField
+          autoComplete="tel"
+          error={phoneError}
+          icon="phone"
+          keyboardType="phone-pad"
+          label="Phone"
+          onChangeText={setPhone}
+          placeholder="0240000000"
+          textContentType="telephoneNumber"
+          tone="paper"
+          value={phone}
+        />
+        <CampusChoices error={campusError} onChange={setCampus} tone="paper" value={campus} />
+      </View>
+      <View style={{ gap: spacing.xs }}>
+        <Button label="Continue" loading={submitting} onPress={submit} />
+        <Pressable
+          accessibilityRole="button"
+          accessibilityState={{ disabled: signingOut, busy: signingOut }}
+          disabled={signingOut}
+          onPress={logOut}
+          style={{ minHeight: layout.minTouchTarget, justifyContent: 'center' }}
+        >
+          <Text style={[typography.bodyMedium, { color: colors.violet }]}>
+            {signingOut ? 'Logging out…' : 'Log out'}
+          </Text>
+        </Pressable>
+      </View>
     </Screen>
   );
 }

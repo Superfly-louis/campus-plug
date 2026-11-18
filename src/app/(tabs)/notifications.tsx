@@ -9,6 +9,7 @@ import { IconButton } from '@/components/ui/IconButton';
 import { InlineError } from '@/components/ui/InlineError';
 import { ListRow } from '@/components/ui/ListRow';
 import { Screen } from '@/components/ui/Screen';
+import { RefreshSpinner } from '@/components/ui/RefreshSpinner';
 import { useTabBarInset } from '@/components/ui/TabBar';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { spacing, typography } from '@/constants/theme';
@@ -86,10 +87,14 @@ export default function NotificationsScreen() {
           if (notifications.hasNextPage && !notifications.isFetchingNextPage) void notifications.fetchNextPage();
         }}
         onEndReachedThreshold={0.4}
-        onRefresh={() => {
-          void notifications.refetch();
-        }}
-        refreshing={notifications.isRefetching && !notifications.isFetchingNextPage}
+        refreshControl={
+          <RefreshSpinner
+            onRefresh={() => {
+              void notifications.refetch();
+            }}
+            refreshing={notifications.isRefetching && !notifications.isFetchingNextPage}
+          />
+        }
         ListHeaderComponent={
           <View style={{ gap: spacing.sm, marginBottom: spacing.sm }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
@@ -119,7 +124,7 @@ export default function NotificationsScreen() {
           )
         }
         ListFooterComponent={
-          notifications.isFetchingNextPage ? <Skeleton height={spacing.huge} rounded="lg" /> : null
+          notifications.isFetchingNextPage ? <Skeleton height={spacing.huge} rounded="lg" /> : undefined
         }
         renderItem={({ item }) => (
           <ListRow

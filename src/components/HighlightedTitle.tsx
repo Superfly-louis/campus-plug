@@ -1,4 +1,4 @@
-import { Text } from 'react-native';
+import { Text, type TextStyle } from 'react-native';
 
 import { colors, typography } from '@/constants/theme';
 
@@ -7,15 +7,21 @@ type TitleVariant = 'hero' | 'display' | 'h1' | 'h2';
 type HighlightedTitleProps = {
   children: string;
   highlight?: string;
+  highlightColor?: string;
   variant?: TitleVariant;
+  color?: string;
+  style?: TextStyle;
 };
 
 export function HighlightedTitle({
   children,
   highlight,
+  highlightColor = colors.primary,
   variant = 'hero',
+  color,
+  style: extra,
 }: HighlightedTitleProps) {
-  const style = typography[variant];
+  const style = [typography[variant], color ? { color } : null, extra];
   if (!highlight) {
     return (
       <Text accessibilityRole="header" style={style}>
@@ -40,7 +46,7 @@ export function HighlightedTitle({
   return (
     <Text accessibilityRole="header" style={style}>
       {before}
-      <Text style={{ color: colors.primary }}>{match}</Text>
+      <Text style={{ color: highlightColor }}>{match}</Text>
       {after}
     </Text>
   );

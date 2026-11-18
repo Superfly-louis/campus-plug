@@ -11,6 +11,7 @@ import { Chip } from '@/components/ui/Chip';
 import { IconButton } from '@/components/ui/IconButton';
 import { InlineError } from '@/components/ui/InlineError';
 import { Screen } from '@/components/ui/Screen';
+import { RefreshSpinner } from '@/components/ui/RefreshSpinner';
 import { useTabBarInset } from '@/components/ui/TabBar';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { colors, limits, spacing, typography } from '@/constants/theme';
@@ -205,10 +206,14 @@ export default function DashboardScreen() {
             if (audit.hasNextPage && !audit.isFetchingNextPage) void audit.fetchNextPage();
           }}
           onEndReachedThreshold={0.4}
-          onRefresh={() => {
-            void audit.refetch();
-          }}
-          refreshing={audit.isRefetching && !audit.isFetchingNextPage}
+          refreshControl={
+            <RefreshSpinner
+              onRefresh={() => {
+                void audit.refetch();
+              }}
+              refreshing={audit.isRefetching && !audit.isFetchingNextPage}
+            />
+          }
           ListHeaderComponent={heading(null)}
           ListEmptyComponent={
             audit.isPending ? (
@@ -230,7 +235,7 @@ export default function DashboardScreen() {
               />
             )
           }
-          ListFooterComponent={audit.isFetchingNextPage ? <Skeleton height={spacing.huge} rounded="lg" /> : null}
+          ListFooterComponent={audit.isFetchingNextPage ? <Skeleton height={spacing.huge} rounded="lg" /> : undefined}
           renderItem={({ item }) => <AuditEntryCard entry={item} when={formatDateTime(item.createdAt)} />}
         />
       </Screen>
@@ -250,10 +255,14 @@ export default function DashboardScreen() {
             if (products.hasNextPage && !products.isFetchingNextPage) void products.fetchNextPage();
           }}
           onEndReachedThreshold={0.4}
-          onRefresh={() => {
-            void products.refetch();
-          }}
-          refreshing={products.isRefetching && !products.isFetchingNextPage}
+          refreshControl={
+            <RefreshSpinner
+              onRefresh={() => {
+                void products.refetch();
+              }}
+              refreshing={products.isRefetching && !products.isFetchingNextPage}
+            />
+          }
           ListHeaderComponent={heading(
             <ScrollView
               horizontal
@@ -286,7 +295,7 @@ export default function DashboardScreen() {
               <MarketplaceState body={empty.body} icon="package" status="empty" title={empty.title} />
             )
           }
-          ListFooterComponent={products.isFetchingNextPage ? <Skeleton height={spacing.huge} rounded="lg" /> : null}
+          ListFooterComponent={products.isFetchingNextPage ? <Skeleton height={spacing.huge} rounded="lg" /> : undefined}
           renderItem={({ item }) => (
             <ProductModerationCard
               busy={busy}
@@ -317,10 +326,14 @@ export default function DashboardScreen() {
           if (shops.hasNextPage && !shops.isFetchingNextPage) void shops.fetchNextPage();
         }}
         onEndReachedThreshold={0.4}
-        onRefresh={() => {
-          void shops.refetch();
-        }}
-        refreshing={shops.isRefetching && !shops.isFetchingNextPage}
+        refreshControl={
+          <RefreshSpinner
+            onRefresh={() => {
+              void shops.refetch();
+            }}
+            refreshing={shops.isRefetching && !shops.isFetchingNextPage}
+          />
+        }
         ListHeaderComponent={heading(
           <View style={{ gap: spacing.sm }}>
             <SegmentedControl
@@ -358,7 +371,7 @@ export default function DashboardScreen() {
             />
           )
         }
-        ListFooterComponent={shops.isFetchingNextPage ? <Skeleton height={spacing.huge} rounded="lg" /> : null}
+        ListFooterComponent={shops.isFetchingNextPage ? <Skeleton height={spacing.huge} rounded="lg" /> : undefined}
         renderItem={({ item }) => (
           <VendorReviewCard
             applied={formatDateTime(item.createdAt)}

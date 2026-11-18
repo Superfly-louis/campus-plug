@@ -12,6 +12,7 @@ import { Icon } from '@/components/ui/Icon';
 import { IconButton } from '@/components/ui/IconButton';
 import { InlineError } from '@/components/ui/InlineError';
 import { Screen } from '@/components/ui/Screen';
+import { RefreshSpinner } from '@/components/ui/RefreshSpinner';
 import { useTabBarInset } from '@/components/ui/TabBar';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { TextField } from '@/components/ui/TextField';
@@ -160,10 +161,14 @@ export default function SearchScreen() {
           if (results.hasNextPage && !results.isFetchingNextPage) void results.fetchNextPage();
         }}
         onEndReachedThreshold={0.4}
-        onRefresh={() => {
-          void results.refetch();
-        }}
-        refreshing={results.isRefetching && !results.isPending}
+        refreshControl={
+          <RefreshSpinner
+            onRefresh={() => {
+              void results.refetch();
+            }}
+            refreshing={results.isRefetching && !results.isPending}
+          />
+        }
         renderItem={({ item }) => {
           const match = categories.data?.find((category) => category.id === item.categoryId);
           const visual = match ? categoryVisual(match.slug, match.name) : null;
@@ -255,7 +260,7 @@ export default function SearchScreen() {
             <View style={{ paddingVertical: spacing.md }}>
               <ProductCardSkeleton />
             </View>
-          ) : null
+          ) : undefined
         }
         style={{ flex: 1 }}
       />

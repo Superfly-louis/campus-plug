@@ -68,6 +68,11 @@ function raise(error: unknown): never {
   throw new Error(toFriendlyError(error));
 }
 
+function authRedirect(path: string): string {
+  const trimmed = path.replace(/^\/+/, '');
+  return trimmed.length > 0 ? `campusplug://${trimmed}` : 'campusplug://';
+}
+
 async function fetchProfile(userId: string): Promise<Profile> {
   const { data, error } = await supabase
     .from('profiles')
@@ -238,7 +243,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       password,
       options: {
         data: { full_name: fullName.trim() },
-        emailRedirectTo: Linking.createURL('/'),
+        emailRedirectTo: authRedirect('/'),
       },
     });
     if (error) raise(error);
@@ -258,14 +263,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { error } = await supabase.auth.resend({
       type: 'signup',
       email: email.trim().toLowerCase(),
-      options: { emailRedirectTo: Linking.createURL('/') },
+      options: { emailRedirectTo: authRedirect('/') },
     });
     if (error) raise(error);
   }, []);
 
   const requestPasswordReset = useCallback(async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
-      redirectTo: Linking.createURL('/reset-password'),
+      redirectTo: authRedirect('/reset-password'),
     });
     if (error) raise(error);
   }, []);

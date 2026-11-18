@@ -1,6 +1,7 @@
-import { ScrollView, View } from 'react-native';
+import { View } from 'react-native';
 
 import { CategoryTile } from '@/components/marketplace/CategoryTile';
+import { HorizontalScroll } from '@/components/ui/HorizontalScroll';
 import { categoryVisual } from '@/constants/categories';
 import { colors, layout, radius, spacing } from '@/constants/theme';
 
@@ -23,12 +24,7 @@ export function CategoryRow({ categories, selectedId = null, onSelect, contained
   }
 
   const row = (
-    <ScrollView
-      horizontal
-      nestedScrollEnabled
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={{ gap: spacing.sm, paddingVertical: spacing.xxs }}
-    >
+    <HorizontalScroll contentContainerStyle={{ gap: spacing.sm, paddingVertical: spacing.xxs }}>
       {categories.map((category) => {
         const visual = categoryVisual(category.slug, category.name);
         return (
@@ -41,7 +37,7 @@ export function CategoryRow({ categories, selectedId = null, onSelect, contained
           />
         );
       })}
-    </ScrollView>
+    </HorizontalScroll>
   );
 
   if (!contained) return row;

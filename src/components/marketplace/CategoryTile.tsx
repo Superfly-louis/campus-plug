@@ -1,7 +1,7 @@
-import { Pressable, Text } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { Icon, type IconName } from '@/components/ui/Icon';
-import { colors, icon, marketplace, motion, radius, spacing, typography } from '@/constants/theme';
+import { colors, icon, layout, motion, radius, spacing, typography } from '@/constants/theme';
 
 type CategoryTileProps = {
   icon: IconName;
@@ -11,6 +11,8 @@ type CategoryTileProps = {
   accessibilityLabel?: string;
 };
 
+const plateSize = 36;
+
 export function CategoryTile({
   icon: iconName,
   label,
@@ -18,40 +20,45 @@ export function CategoryTile({
   onPress,
   accessibilityLabel,
 }: CategoryTileProps) {
+  const name = label.replace('\n', ' ');
+
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={accessibilityLabel ?? label.replace('\n', ' ')}
+      accessibilityLabel={accessibilityLabel ?? name}
       accessibilityState={{ selected: active }}
       onPress={onPress}
       style={({ pressed }) => ({
-        width: marketplace.categoryTileWidth,
-        height: marketplace.categoryTileHeight,
-        borderRadius: radius.lg,
-        paddingHorizontal: spacing.xs,
-        paddingVertical: spacing.xxs,
+        minHeight: layout.minTouchTarget,
+        flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
-        gap: spacing.xxs,
-        backgroundColor: active ? colors.primary : colors.indigo,
+        gap: spacing.xs,
+        paddingLeft: spacing.xxs,
+        paddingRight: spacing.md,
+        borderRadius: radius.pill,
+        borderWidth: layout.borderWidth,
+        borderColor: active ? colors.primary : colors.border,
+        backgroundColor: active ? colors.primary : colors.surface,
         opacity: pressed ? motion.pressedOpacity : 1,
       })}
     >
-      <Icon name={iconName} size={icon.sm} color={active ? 'textOnPrimary' : 'lilac'} />
-      <Text
-        adjustsFontSizeToFit
-        minimumFontScale={0.85}
-        numberOfLines={2}
+      <View
         style={{
-          width: '100%',
-          fontFamily: typography.caption.fontFamily,
-          fontSize: 11,
-          lineHeight: 13,
-          color: active ? colors.textOnPrimary : colors.lilac,
-          textAlign: 'center',
+          width: plateSize,
+          height: plateSize,
+          borderRadius: radius.pill,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: active ? colors.background : colors.primarySoft,
         }}
       >
-        {label}
+        <Icon name={iconName} size={icon.md} color="primary" />
+      </View>
+      <Text
+        numberOfLines={1}
+        style={[typography.bodyMedium, { color: active ? colors.textOnPrimary : colors.textPrimary }]}
+      >
+        {name}
       </Text>
     </Pressable>
   );
