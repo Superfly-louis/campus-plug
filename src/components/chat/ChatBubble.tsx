@@ -2,6 +2,7 @@ import { Pressable, Text, View } from 'react-native';
 
 import { ReceiptMarks, type ReceiptState } from '@/components/chat/ReceiptMarks';
 import { colors, radius, spacing, typography } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 type ChatBubbleProps = {
   body: string;
@@ -14,6 +15,7 @@ type ChatBubbleProps = {
 };
 
 export function ChatBubble({ body, time, mine, pending = false, failed = false, receipt = null, onRetry }: ChatBubbleProps) {
+  useThemeMode();
   return (
     <View style={{ alignItems: mine ? 'flex-end' : 'flex-start', gap: spacing.xxs }}>
       <View
@@ -29,7 +31,7 @@ export function ChatBubble({ body, time, mine, pending = false, failed = false, 
           backgroundColor: mine ? colors.violet : colors.surfaceAlt,
         }}
       >
-        <Text style={[typography.body, { color: colors.textPrimary }]}>{body}</Text>
+        <Text style={[typography.body, { color: mine ? colors.paper : colors.textPrimary }]}>{body}</Text>
         <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: spacing.xxs, marginTop: spacing.xxs }}>
           <Text style={[typography.caption, { color: mine ? colors.lilac : colors.textMuted }]}>
             {pending ? 'Sending' : time}

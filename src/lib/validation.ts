@@ -125,6 +125,17 @@ export const meetingPointSchema = z
   .min(limits.meetingPointMin, 'Enter where the vendor should meet you.')
   .max(limits.meetingPointMax, `Use at most ${limits.meetingPointMax} characters.`);
 
+export const reviewRatingSchema = z
+  .number()
+  .int('Choose a whole star rating.')
+  .min(1, 'Choose a rating from 1 to 5.')
+  .max(5, 'Choose a rating from 1 to 5.');
+
+export const reviewBodySchema = z
+  .string()
+  .trim()
+  .max(limits.reviewBodyMax, `Use at most ${limits.reviewBodyMax} characters.`);
+
 export const orderNoteSchema = z
   .string()
   .trim()

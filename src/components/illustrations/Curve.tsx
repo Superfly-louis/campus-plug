@@ -2,6 +2,7 @@ import { View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import { colors, decoration } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 type CurveProps = {
   width?: number;
@@ -12,6 +13,7 @@ export function Curve({
   width = decoration.curveWidth,
   height = decoration.curveHeight,
 }: CurveProps) {
+  useThemeMode();
   return (
     <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
       <Svg

@@ -10,6 +10,7 @@ import { HighlightedTitle } from '@/components/HighlightedTitle';
 import { Icon } from '@/components/ui/Icon';
 import { colors, icon, layout, motion, radius, spacing, typography } from '@/constants/theme';
 import { useIntro } from '@/lib/intro';
+import { useThemeMode } from '@/lib/themeMode';
 
 const readable: TextStyle = {
   textShadowColor: colors.paper,
@@ -55,6 +56,7 @@ function limeWave(width: number, height: number): string {
 }
 
 function SlideWash({ width, height }: { width: number; height: number }) {
+  useThemeMode();
   const band = height * 0.46;
   return (
     <>
@@ -110,6 +112,7 @@ function SlideWash({ width, height }: { width: number; height: number }) {
 }
 
 export default function WelcomeScreen() {
+  useThemeMode();
   const { complete } = useIntro();
   const scrollRef = useRef<ScrollViewInstance>(null);
   const [index, setIndex] = useState(0);
@@ -124,8 +127,8 @@ export default function WelcomeScreen() {
   }, []);
 
   const goTo = (next: number) => {
-    if (frame.height <= 0) return;
-    scrollRef.current?.scrollTo({ y: next * frame.height, animated: true });
+    if (frame.width <= 0) return;
+    scrollRef.current?.scrollTo({ x: next * frame.width, animated: true });
     setIndex(next);
   };
 
@@ -142,11 +145,12 @@ export default function WelcomeScreen() {
         <ScrollView
           ref={scrollRef}
           style={{ flex: 1 }}
+          horizontal
           pagingEnabled
           bounces={false}
-          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
           onMomentumScrollEnd={(event) => {
-            const next = Math.round(event.nativeEvent.contentOffset.y / frame.height);
+            const next = Math.round(event.nativeEvent.contentOffset.x / frame.width);
             setIndex(Math.min(Math.max(next, 0), slides.length - 1));
           }}
         >
@@ -231,10 +235,10 @@ export default function WelcomeScreen() {
                 gap: spacing.xs,
               })}
             >
-              <Text style={[typography.button, { color: colors.textPrimary }]}>
+              <Text style={[typography.button, { color: colors.paper }]}>
                 {last ? 'Get Started' : 'Next'}
               </Text>
-              <Icon name={last ? 'arrow-right' : 'chevron-down'} size={icon.sm} color="textPrimary" />
+              <Icon name={last ? 'arrow-right' : 'chevron-right'} size={icon.sm} color="paper" />
             </Pressable>
           </View>
         </View>

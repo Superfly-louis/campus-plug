@@ -3,12 +3,14 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Pressable, Text, View } from 'react-native';
 
 import { OptionalMeta, productCountLabel, type OptionalMetaProps } from '@/components/marketplace/OptionalMeta';
+import { VerifiedMark } from '@/components/marketplace/VerifiedMark';
 import { Avatar } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
 import { Icon } from '@/components/ui/Icon';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { colors, gradientAxis, gradients, icon, layout, marketplace, motion, radius, spacing, typography } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 type VendorCardProps = OptionalMetaProps & {
   name: string;
@@ -18,6 +20,7 @@ type VendorCardProps = OptionalMetaProps & {
   coverUrl?: string | null;
   logoUrl?: string | null;
   isNew?: boolean;
+  verified?: boolean;
   variant?: 'home' | 'explore';
   fill?: boolean;
   onPress: () => void;
@@ -31,6 +34,7 @@ export function VendorCard({
   coverUrl,
   logoUrl,
   isNew = false,
+  verified = false,
   variant = 'home',
   fill = false,
   onPress,
@@ -40,13 +44,14 @@ export function VendorCard({
   wished,
   onToggleWishlist,
 }: VendorCardProps) {
+  useThemeMode();
   const explore = variant === 'explore';
   const overlap = layout.minTouchTarget / 2;
 
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={name}
+      accessibilityLabel={verified ? `${name}, verified shop` : name}
       onPress={onPress}
       style={({ pressed }) => ({
         width: fill ? '100%' : marketplace.vendorCardWidth,
@@ -101,9 +106,12 @@ export function VendorCard({
             gap: spacing.xxs,
           }}
         >
-          <Text numberOfLines={1} style={typography.h2}>
-            {name}
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xxs }}>
+            <Text numberOfLines={1} style={[typography.h2, { flexShrink: 1 }]}>
+              {name}
+            </Text>
+            {verified ? <VerifiedMark /> : null}
+          </View>
           {categoryLabel ? (
             <Text numberOfLines={1} style={[typography.caption, { color: colors.lilac }]}>
               {categoryLabel}
@@ -137,7 +145,7 @@ export function VendorCard({
             justifyContent: 'center',
           }}
         >
-          <Icon name="chevron-right" size={icon.sm} color="textPrimary" />
+          <Icon name="chevron-right" size={icon.sm} color="paper" />
         </View>
       </Card>
     </Pressable>
@@ -145,6 +153,7 @@ export function VendorCard({
 }
 
 export function VendorCardSkeleton({ fill = false }: { fill?: boolean }) {
+  useThemeMode();
   return (
     <View style={{ width: fill ? '100%' : marketplace.vendorCardWidth }}>
       <Skeleton height={marketplace.coverHeight + spacing.huge} rounded="xl" />

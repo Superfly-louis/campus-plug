@@ -95,6 +95,24 @@ export function toFriendlyError(error: unknown): string {
   if (message.includes('that status change is not allowed')) {
     return 'This order changed. Showing the latest status.';
   }
+  if (message.includes('rating must be from 1 to 5')) {
+    return 'Choose a rating from 1 to 5.';
+  }
+  if (message.includes('review is too long')) {
+    return `Use at most ${limits.reviewBodyMax} characters.`;
+  }
+  if (message.includes('only the buyer can review this order')) {
+    return 'Only the buyer can review this order.';
+  }
+  if (message.includes('review a completed order')) {
+    return 'You can review a shop after the order is completed.';
+  }
+  if (message.includes('this order already has a review')) {
+    return 'You already reviewed this order.';
+  }
+  if (message.includes('could not find the function') && message.includes('review')) {
+    return 'Reviews are not ready yet. Run the reviews SQL, then try again.';
+  }
   if (message.includes('you cannot order from your own shop')) {
     return 'You cannot order from your own shop.';
   }

@@ -2,12 +2,12 @@ import { RefreshControl } from 'react-native';
 
 import { colors } from '@/constants/theme';
 
-type RefreshSpinnerProps = {
+type RefreshControlArgs = {
   refreshing: boolean;
   onRefresh: () => void;
 };
 
-export function RefreshSpinner({ refreshing, onRefresh }: RefreshSpinnerProps) {
+export function refreshControlFor({ refreshing, onRefresh }: RefreshControlArgs) {
   return (
     <RefreshControl
       colors={[colors.primary]}

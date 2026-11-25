@@ -2,6 +2,7 @@ import { Pressable, Text, View } from 'react-native';
 
 import { Icon, type IconName } from '@/components/ui/Icon';
 import { colors, layout, motion, spacing, typography } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 type SectionHeaderProps = {
   title: string;
@@ -10,6 +11,7 @@ type SectionHeaderProps = {
 };
 
 export function SectionHeader({ title, icon, onSeeAll }: SectionHeaderProps) {
+  useThemeMode();
   return (
     <View
       style={{

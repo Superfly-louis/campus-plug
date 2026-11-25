@@ -1,30 +1,36 @@
 import { router, useLocalSearchParams } from 'expo-router';
+import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 import { FlatList, Pressable, Text, View } from 'react-native';
 
 import { MarketplaceState } from '@/components/marketplace/MarketplaceState';
 import { ProductCard, ProductCardSkeleton } from '@/components/marketplace/ProductCard';
+import { ShopReviews } from '@/components/marketplace/ShopReviews';
 import { StatusBanner } from '@/components/marketplace/StatusBanner';
+import { VerifiedMark } from '@/components/marketplace/VerifiedMark';
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { InlineError } from '@/components/ui/InlineError';
 import { Screen } from '@/components/ui/Screen';
-import { RefreshSpinner } from '@/components/ui/RefreshSpinner';
+import { refreshControlFor } from '@/components/ui/RefreshSpinner';
 import { useTabBarInset } from '@/components/ui/TabBar';
 import { categoryVisual } from '@/constants/categories';
-import { colors, layout, motion, radius, spacing, typography } from '@/constants/theme';
+import { colors, control, gradientAxis, gradients, layout, marketplace, motion, radius, spacing, typography } from '@/constants/theme';
 import { useOpenConversation } from '@/hooks/queries/useConversations';
 import { useVendorProducts } from '@/hooks/queries/useProducts';
 import { useVendor } from '@/hooks/queries/useVendors';
 import { useAuth } from '@/lib/auth';
 import { toFriendlyError } from '@/lib/errors';
 import { getImageUrl } from '@/lib/images';
+import { useThemeMode } from '@/lib/themeMode';
 
 function param(value: string | string[] | undefined): string {
   return Array.isArray(value) ? (value[0] ?? '') : (value ?? '');
 }
 
 export default function ShopScreen() {
+  useThemeMode();
   const params = useLocalSearchParams<{ id?: string | string[] }>();
   const id = param(params.id);
   const tabInset = useTabBarInset();
@@ -73,6 +79,8 @@ export default function ShopScreen() {
   }
 
   const listings = paused || products.isPending || products.isError ? [] : (products.data ?? []);
+  const coverPath = (products.data ?? []).find((item) => item.images[0]?.storage_path)?.images[0]?.storage_path;
+  const coverUrl = getImageUrl('product-images', coverPath);
   const ownsShop = vendor.owner_id === session?.user.id;
   const blocked = ownsShop || paused;
   const vendorId = vendor.id;
@@ -93,15 +101,13 @@ export default function ShopScreen() {
         data={listings}
         keyExtractor={(item) => item.product.id}
         numColumns={2}
-        refreshControl={
-          <RefreshSpinner
-            onRefresh={() => {
-              void shop.refetch();
-              if (!paused) void products.refetch();
-            }}
-            refreshing={(shop.isRefetching || products.isRefetching) && !shop.isPending}
-          />
-        }
+        refreshControl={refreshControlFor({
+          onRefresh: () => {
+            void shop.refetch();
+            if (!paused) void products.refetch();
+          },
+          refreshing: (shop.isRefetching || products.isRefetching) && !shop.isPending,
+        })}
         renderItem={({ item }) => {
           const visual = item.category ? categoryVisual(item.category.slug, item.category.name) : null;
           const cover = item.images[0]?.storage_path;
@@ -121,25 +127,61 @@ export default function ShopScreen() {
         }}
         ListHeaderComponent={
           <View style={{ gap: spacing.md, marginBottom: spacing.sm }}>
-            <Pressable
-              accessibilityLabel="Go back"
-              accessibilityRole="button"
-              onPress={() => router.back()}
-              style={({ pressed }) => ({
-                width: layout.minTouchTarget,
-                height: layout.minTouchTarget,
-                borderRadius: radius.pill,
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: pressed ? colors.surfaceAlt : 'transparent',
-                opacity: pressed ? motion.pressedOpacity : 1,
-              })}
-            >
-              <Icon color="textPrimary" name="chevron-left" />
-            </Pressable>
-            <Avatar name={vendor.shop_name} size="lg" uri={getImageUrl('shop-logos', vendor.logo_url)} />
+            <View>
+              <View
+                style={{
+                  height: marketplace.featuredCover,
+                  borderRadius: radius.xl,
+                  overflow: 'hidden',
+                  backgroundColor: colors.surfaceAlt,
+                }}
+              >
+                {coverUrl ? (
+                  <Image
+                    accessibilityLabel=""
+                    contentFit="cover"
+                    source={{ uri: coverUrl }}
+                    style={{ width: '100%', height: '100%' }}
+                  />
+                ) : (
+                  <LinearGradient
+                    colors={gradients.banner}
+                    end={gradientAxis.end}
+                    start={gradientAxis.start}
+                    style={{ flex: 1 }}
+                  />
+                )}
+              </View>
+              <Pressable
+                accessibilityLabel="Go back"
+                accessibilityRole="button"
+                onPress={() => router.back()}
+                style={({ pressed }) => ({
+                  position: 'absolute',
+                  top: spacing.sm,
+                  left: spacing.sm,
+                  width: layout.minTouchTarget,
+                  height: layout.minTouchTarget,
+                  borderRadius: radius.pill,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: colors.surface,
+                  opacity: pressed ? motion.pressedOpacity : 1,
+                })}
+              >
+                <Icon color="textPrimary" name="chevron-left" />
+              </Pressable>
+              <View style={{ marginTop: -(control.avatarLg / 2), paddingLeft: spacing.md }}>
+                <Avatar name={vendor.shop_name} size="lg" uri={getImageUrl('shop-logos', vendor.logo_url)} />
+              </View>
+            </View>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-              <Text style={[typography.h1, { flex: 1 }]}>{vendor.shop_name}</Text>
+              <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
+                <Text numberOfLines={2} style={[typography.h1, { flexShrink: 1 }]}>
+                  {vendor.shop_name}
+                </Text>
+                {vendor.status === 'approved' ? <VerifiedMark /> : null}
+              </View>
               <Button
                 disabled={blocked || chat.isPending}
                 fullWidth={false}
@@ -152,6 +194,7 @@ export default function ShopScreen() {
             </View>
             {ownsShop ? <Text style={typography.body}>This is your listing</Text> : null}
             {vendor.description ? <Text style={typography.body}>{vendor.description}</Text> : null}
+            <ShopReviews vendorId={vendor.id} />
             {paused ? <StatusBanner message="This shop is paused" tone="warning" /> : null}
             {chat.isError ? <InlineError message={toFriendlyError(chat.error)} /> : null}
           </View>

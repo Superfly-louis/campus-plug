@@ -4,6 +4,7 @@ import { Text, View } from 'react-native';
 import { HighlightedTitle } from '@/components/HighlightedTitle';
 import { Illustration, type IllustrationName } from '@/components/illustrations/Illustration';
 import { colors, illustration, spacing, typography } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 type PageHeroProps = {
   title: string;
@@ -24,6 +25,7 @@ export function PageHero({
   illustration: illustrationName,
   actions,
 }: PageHeroProps) {
+  useThemeMode();
   const art = illustrationName ? (
     <Illustration
       name={illustrationName}

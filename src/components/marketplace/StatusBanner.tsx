@@ -2,6 +2,7 @@ import { Text, View } from 'react-native';
 
 import { Icon, type IconName } from '@/components/ui/Icon';
 import { colors, layout, radius, spacing, typography } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 type StatusTone = 'info' | 'warning' | 'danger';
 
@@ -17,6 +18,7 @@ const tones: Record<StatusTone, { icon: IconName; color: keyof typeof colors }> 
 };
 
 export function StatusBanner({ tone, message }: StatusBannerProps) {
+  useThemeMode();
   const paint = tones[tone];
   return (
     <View

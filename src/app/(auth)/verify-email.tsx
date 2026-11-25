@@ -11,6 +11,7 @@ import { TextField } from '@/components/ui/TextField';
 import { colors, layout, limits, motion, typography } from '@/constants/theme';
 import { useAuth } from '@/lib/auth';
 import { fieldError, otpSchema } from '@/lib/validation';
+import { useThemeMode } from '@/lib/themeMode';
 
 function shown(error: unknown, fallback: string): string {
   return error instanceof Error && error.message ? error.message : fallback;
@@ -23,6 +24,7 @@ function firstString(value: string | string[] | undefined): string {
 }
 
 export default function VerifyEmailScreen() {
+  useThemeMode();
   const { email: emailParam } = useLocalSearchParams<{ email?: string | string[] }>();
   const email = firstString(emailParam);
   const { verifyEmailCode, resendSignupCode } = useAuth();

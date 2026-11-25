@@ -5,6 +5,7 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { ImageCarousel } from '@/components/marketplace/ImageCarousel';
 import { MarketplaceState } from '@/components/marketplace/MarketplaceState';
 import { PriceText } from '@/components/marketplace/PriceText';
+import { VerifiedMark } from '@/components/marketplace/VerifiedMark';
 import { OrderSheet } from '@/components/orders/OrderSheet';
 import { Avatar } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
@@ -13,7 +14,7 @@ import { Icon } from '@/components/ui/Icon';
 import { IconButton } from '@/components/ui/IconButton';
 import { InlineError } from '@/components/ui/InlineError';
 import { Screen } from '@/components/ui/Screen';
-import { RefreshSpinner } from '@/components/ui/RefreshSpinner';
+import { refreshControlFor } from '@/components/ui/RefreshSpinner';
 import { categoryVisual } from '@/constants/categories';
 import { colors, layout, motion, radius, spacing, typography } from '@/constants/theme';
 import { useOpenConversation } from '@/hooks/queries/useConversations';
@@ -21,12 +22,14 @@ import { useProduct } from '@/hooks/queries/useProducts';
 import { useAuth } from '@/lib/auth';
 import { toFriendlyError } from '@/lib/errors';
 import { getImageUrl } from '@/lib/images';
+import { useThemeMode } from '@/lib/themeMode';
 
 function param(value: string | string[] | undefined): string {
   return Array.isArray(value) ? (value[0] ?? '') : (value ?? '');
 }
 
 function UnavailableProduct() {
+  useThemeMode();
   return (
     <Screen>
       <MarketplaceState
@@ -42,6 +45,7 @@ function UnavailableProduct() {
 }
 
 export default function ProductScreen() {
+  useThemeMode();
   const params = useLocalSearchParams<{ id?: string | string[] }>();
   const id = param(params.id);
   const product = useProduct(id);
@@ -101,14 +105,12 @@ export default function ProductScreen() {
         <ScrollView
           contentInsetAdjustmentBehavior="never"
           contentContainerStyle={{ paddingBottom: spacing.xl }}
-          refreshControl={
-            <RefreshSpinner
-              onRefresh={() => {
-                void product.refetch();
-              }}
-              refreshing={product.isRefetching}
-            />
-          }
+          refreshControl={refreshControlFor({
+            onRefresh: () => {
+              void product.refetch();
+            },
+            refreshing: product.isRefetching,
+          })}
         >
           <View>
             <ImageCarousel accessibilityLabel={detail.product.title} images={photos} />
@@ -138,7 +140,11 @@ export default function ProductScreen() {
             {visual ? <Badge label={visual.label} tone={visual.tone} /> : null}
             {detail.product.description ? <Text style={typography.body}>{detail.product.description}</Text> : null}
             <Pressable
-              accessibilityLabel={`${detail.vendor.shop_name}. View shop`}
+              accessibilityLabel={
+                detail.vendor.status === 'approved'
+                  ? `${detail.vendor.shop_name}, verified shop. View shop`
+                  : `${detail.vendor.shop_name}. View shop`
+              }
               accessibilityRole="button"
               onPress={() => router.push({ pathname: '/shop/[id]', params: { id: detail.vendor.id } })}
               style={({ pressed }) => ({
@@ -151,7 +157,12 @@ export default function ProductScreen() {
             >
               <Avatar name={detail.vendor.shop_name} uri={getImageUrl('shop-logos', detail.vendor.logo_url)} />
               <View style={{ flex: 1, gap: spacing.xxs }}>
-                <Text style={typography.bodyMedium}>{detail.vendor.shop_name}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
+                  <Text numberOfLines={1} style={[typography.bodyMedium, { flexShrink: 1 }]}>
+                    {detail.vendor.shop_name}
+                  </Text>
+                  {detail.vendor.status === 'approved' ? <VerifiedMark /> : null}
+                </View>
                 <Text style={[typography.caption, { color: colors.lilac }]}>View shop</Text>
               </View>
               <Icon color="periwinkle" name="chevron-right" />

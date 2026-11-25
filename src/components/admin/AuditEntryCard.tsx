@@ -5,6 +5,7 @@ import { colors, spacing, typography } from '@/constants/theme';
 import type { AuditEntry } from '@/lib/api/admin';
 
 import type { Json } from '../../../types/database.types';
+import { useThemeMode } from '@/lib/themeMode';
 
 type AuditEntryCardProps = {
   entry: AuditEntry;
@@ -30,6 +31,7 @@ function titleFor(entry: AuditEntry): string {
 }
 
 export function AuditEntryCard({ entry, when }: AuditEntryCardProps) {
+  useThemeMode();
   const admin = entry.adminName?.trim() || 'Deleted user';
   const reason = textValue(entry.metadata, 'reason');
   return (

@@ -24,6 +24,7 @@ import { useAuth, type Vendor } from '@/lib/auth';
 import { toFriendlyError } from '@/lib/errors';
 import { getImageUrl } from '@/lib/images';
 import type { Product } from '@/lib/api/products';
+import { useThemeMode } from '@/lib/themeMode';
 
 const productStatus: Record<Product['status'], { label: string; tone: BadgeTone }> = {
   active: { label: 'Active', tone: 'lime' },
@@ -32,6 +33,7 @@ const productStatus: Record<Product['status'], { label: string; tone: BadgeTone 
 };
 
 export default function MyShopScreen() {
+  useThemeMode();
   const { vendor, profileError, refreshProfile } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
   const [checking, setChecking] = useState(false);
@@ -90,6 +92,7 @@ export default function MyShopScreen() {
 }
 
 function SupportNote() {
+  useThemeMode();
   return (
     <View style={{ gap: spacing.md }}>
       <Text style={typography.body}>Contact support if you have a question about this decision.</Text>
@@ -113,6 +116,7 @@ function ShopDashboard({
   refreshing: boolean;
   onRefresh: () => void;
 }) {
+  useThemeMode();
   const products = useVendorProducts(vendor.id, 'owner');
   const incoming = useIncomingPendingCount();
   const updateShop = useUpdateShop();

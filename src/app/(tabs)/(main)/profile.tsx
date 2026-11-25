@@ -17,8 +17,10 @@ import { useConversations } from '@/hooks/queries/useConversations';
 import { useProfileStats } from '@/hooks/useProfileStats';
 import { useAuth } from '@/lib/auth';
 import { getImageUrl } from '@/lib/images';
+import { useThemeMode } from '@/lib/themeMode';
 
 export default function ProfileScreen() {
+  useThemeMode();
   const { profile, vendor, signOut } = useAuth();
   const stats = useProfileStats();
   const conversations = useConversations();

@@ -4,6 +4,7 @@ import { CategoryTile } from '@/components/marketplace/CategoryTile';
 import { HorizontalScroll } from '@/components/ui/HorizontalScroll';
 import { categoryVisual } from '@/constants/categories';
 import { colors, layout, radius, spacing } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 export type CategoryChoice = {
   id: string;
@@ -19,6 +20,7 @@ type CategoryRowProps = {
 };
 
 export function CategoryRow({ categories, selectedId = null, onSelect, contained = false }: CategoryRowProps) {
+  useThemeMode();
   function choose(category: CategoryChoice) {
     onSelect(selectedId === category.id ? null : category);
   }

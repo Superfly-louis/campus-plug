@@ -1,6 +1,7 @@
 import { Text, View } from 'react-native';
 
 import { colors, layout, radius, spacing, typography } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 export type BadgeTone = 'lime' | 'violet' | 'food' | 'fashion' | 'tech' | 'services';
 
@@ -9,17 +10,16 @@ type BadgeProps = {
   tone?: BadgeTone;
 };
 
-const tones: Record<BadgeTone, { fill: string; text: string }> = {
-  lime: { fill: colors.primary, text: colors.textOnPrimary },
-  violet: { fill: colors.violet, text: colors.textPrimary },
-  food: { fill: colors.warning, text: colors.textOnPrimary },
-  fashion: { fill: colors.lilac, text: colors.textOnPrimary },
-  tech: { fill: colors.indigo, text: colors.textPrimary },
-  services: { fill: colors.indigoDeep, text: colors.textPrimary },
-};
-
 export function Badge({ label, tone = 'lime' }: BadgeProps) {
-  const paint = tones[tone];
+  useThemeMode();
+  const paint = {
+    lime: { fill: colors.primary, text: colors.textOnPrimary },
+    violet: { fill: colors.violet, text: colors.paper },
+    food: { fill: colors.warning, text: colors.textOnPrimary },
+    fashion: { fill: colors.lilac, text: colors.textOnPrimary },
+    tech: { fill: colors.indigo, text: colors.paper },
+    services: { fill: colors.indigo, text: colors.paper },
+  }[tone];
   return (
     <View
       accessibilityLabel={label}

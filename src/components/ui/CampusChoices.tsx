@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Icon } from '@/components/ui/Icon';
 import { campuses, isCampus, type Campus } from '@/constants/campuses';
 import { colors, icon, layout, motion, radius, spacing, typography } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 type CampusChoicesProps = {
   value: string;
@@ -14,6 +15,7 @@ type CampusChoicesProps = {
 };
 
 export function CampusChoices({ value, onChange, error, tone = 'dark' }: CampusChoicesProps) {
+  useThemeMode();
   const insets = useSafeAreaInsets();
   const [open, setOpen] = useState(false);
   const paper = tone === 'paper';

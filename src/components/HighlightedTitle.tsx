@@ -1,6 +1,7 @@
 import { Text, type TextStyle } from 'react-native';
 
 import { colors, typography } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 type TitleVariant = 'hero' | 'display' | 'h1' | 'h2';
 
@@ -21,6 +22,7 @@ export function HighlightedTitle({
   color,
   style: extra,
 }: HighlightedTitleProps) {
+  useThemeMode();
   const style = [typography[variant], color ? { color } : null, extra];
   if (!highlight) {
     return (

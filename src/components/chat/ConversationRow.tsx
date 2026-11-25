@@ -5,6 +5,7 @@ import { UnreadBadge } from '@/components/chat/UnreadBadge';
 import { Avatar } from '@/components/ui/Avatar';
 import { colors, layout, spacing, typography } from '@/constants/theme';
 import { useOnline } from '@/lib/presence';
+import { useThemeMode } from '@/lib/themeMode';
 
 type ConversationRowProps = {
   name: string;
@@ -29,6 +30,7 @@ export function ConversationRow({
   unreadCount,
   onPress,
 }: ConversationRowProps) {
+  useThemeMode();
   const shown = name.trim().length > 0 ? name : 'Deleted user';
   const online = useOnline(counterpartId);
   const unread = unreadCount > 0;

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { View } from 'react-native';
 
 import { colors, layout, radius, shadows, spacing } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 type CardProps = {
   children: ReactNode;
@@ -9,6 +10,7 @@ type CardProps = {
 };
 
 export function Card({ children, padded = true }: CardProps) {
+  useThemeMode();
   return (
     <View
       style={{

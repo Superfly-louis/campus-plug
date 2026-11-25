@@ -2,8 +2,10 @@ import { Text, View } from 'react-native';
 
 import { colors, layout, spacing, typography } from '@/constants/theme';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
+import { useThemeMode } from '@/lib/themeMode';
 
 export function OfflineBanner() {
+  useThemeMode();
   const { offline } = useNetworkStatus();
 
   if (!offline) return null;

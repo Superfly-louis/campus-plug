@@ -4,6 +4,7 @@ import { Pressable, View } from 'react-native';
 import { Badge } from '@/components/ui/Badge';
 import { Icon } from '@/components/ui/Icon';
 import { colors, layout, limits, motion, radius, spacing } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 export type GalleryImage = {
   id: string;
@@ -25,6 +26,7 @@ export function ImagePickerGrid({
   onRemove,
   max = limits.maxProductImages,
 }: ImagePickerGridProps) {
+  useThemeMode();
   const canAdd = images.length < max;
   return (
     <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }}>

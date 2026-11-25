@@ -2,21 +2,24 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Text, View } from 'react-native';
 
+import { OrderReviewCard } from '@/components/orders/OrderReviewCard';
 import { OrderTimeline } from '@/components/orders/OrderTimeline';
 import { OrderDetailState } from '@/components/orders/OrderListState';
 import { PriceText } from '@/components/marketplace/PriceText';
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { Icon, type IconName } from '@/components/ui/Icon';
 import { IconButton } from '@/components/ui/IconButton';
 import { InlineError } from '@/components/ui/InlineError';
 import { Screen } from '@/components/ui/Screen';
 import { StatusPill } from '@/components/ui/StatusPill';
-import { actionStatus, orderStatus, type OrderAction } from '@/constants/orderStatus';
-import { colors, spacing, typography } from '@/constants/theme';
+import { actionStatus, orderStatus, type DbOrderStatus, type OrderAction } from '@/constants/orderStatus';
+import { colors, icon, layout, radius, spacing, typography } from '@/constants/theme';
 import { useAuth } from '@/lib/auth';
 import { toFriendlyError } from '@/lib/errors';
 import { useOrder, useOrdersRealtime, useUpdateOrderStatus } from '@/hooks/queries/useOrders';
+import { useThemeMode } from '@/lib/themeMode';
 
 function param(value: string | string[] | undefined): string {
   return Array.isArray(value) ? (value[0] ?? '') : (value ?? '');
@@ -42,7 +45,59 @@ function isDestructive(action: OrderAction): boolean {
   return action === 'reject' || action === 'cancel';
 }
 
+const progressCopy: Record<DbOrderStatus, { buyer: string; vendor: string }> = {
+  pending: {
+    buyer: 'Waiting for the shop to accept.',
+    vendor: 'Accept this order to start preparing it.',
+  },
+  accepted: {
+    buyer: 'The shop is preparing your order.',
+    vendor: 'Preparing. Mark it ready when it can be picked up.',
+  },
+  ready: {
+    buyer: 'Ready for you at the meeting point.',
+    vendor: 'Ready for pickup. Mark it completed after handover.',
+  },
+  completed: {
+    buyer: 'This order is complete.',
+    vendor: 'This order is complete.',
+  },
+  rejected: {
+    buyer: 'The shop declined this order.',
+    vendor: 'You declined this order.',
+  },
+  cancelled: {
+    buyer: 'This order was cancelled.',
+    vendor: 'This order was cancelled.',
+  },
+};
+
+function DetailRow({ icon: iconName, label, value }: { icon: IconName; label: string; value: string }) {
+  useThemeMode();
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+      <View
+        style={{
+          width: spacing.xxxl,
+          height: spacing.xxxl,
+          borderRadius: radius.pill,
+          backgroundColor: colors.surfaceAlt,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Icon color="lilac" name={iconName} size={icon.sm} />
+      </View>
+      <View style={{ flex: 1, gap: spacing.xxs }}>
+        <Text style={typography.caption}>{label}</Text>
+        <Text style={typography.body}>{value}</Text>
+      </View>
+    </View>
+  );
+}
+
 export default function OrderDetailScreen() {
+  useThemeMode();
   const params = useLocalSearchParams<{ id?: string | string[] }>();
   const id = param(params.id);
   const { session } = useAuth();
@@ -101,7 +156,12 @@ export default function OrderDetailScreen() {
       refreshing={order.isRefetching && !order.isPending}
       scroll
     >
-      <IconButton accessibilityLabel="Go back" name="chevron-left" onPress={() => router.back()} />
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
+        <IconButton accessibilityLabel="Go back" name="chevron-left" onPress={() => router.back()} />
+        <Text accessibilityRole="header" style={typography.h1}>
+          Order
+        </Text>
+      </View>
       <OrderDetailState
         error={order.error}
         missing={id.length === 0 || (!order.isPending && !order.isError && !detail)}
@@ -112,18 +172,24 @@ export default function OrderDetailScreen() {
       >
         {detail ? (
           <View style={{ gap: spacing.lg }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing.sm }}>
-              <Text style={[typography.h2, { flex: 1 }]}>{heading}</Text>
-              <StatusPill status={orderStatus[detail.order.status].pill} />
+            <View style={{ gap: spacing.xs }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing.sm }}>
+                <Text style={[typography.h2, { flex: 1 }]}>{heading}</Text>
+                <StatusPill status={orderStatus[detail.order.status].pill} />
+              </View>
+              <Text style={typography.bodySmall}>{progressCopy[detail.order.status][isVendor ? 'vendor' : 'buyer']}</Text>
             </View>
-            <OrderTimeline status={detail.order.status} />
+            <Card>
+              <OrderTimeline status={detail.order.status} />
+            </Card>
+            {isBuyer && detail.order.status === 'completed' ? <OrderReviewCard orderId={detail.order.id} /> : null}
             <Card>
               {detail.items.length === 0 ? (
                 <Text style={typography.body}>No items on this order.</Text>
               ) : (
                 detail.items.map((item) => (
                   <View key={item.id} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-                    <Text numberOfLines={2} style={[typography.body, { flex: 1 }]}>
+                    <Text numberOfLines={2} style={[typography.bodyMedium, { flex: 1 }]}>
                       {item.title}
                     </Text>
                     <Text style={typography.caption}>{`× ${item.quantity}`}</Text>
@@ -131,46 +197,45 @@ export default function OrderDetailScreen() {
                   </View>
                 ))
               )}
+              <View style={{ height: layout.borderWidth, backgroundColor: colors.border }} />
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Text style={typography.bodyMedium}>Total</Text>
                 <PriceText amount={detail.order.totalAmount} />
               </View>
             </Card>
             <Card>
-              <Text style={typography.bodyMedium}>Cash on delivery</Text>
-              <View style={{ gap: spacing.xxs }}>
-                <Text style={typography.caption}>Meeting point</Text>
-                <Text style={typography.body}>
-                  {detail.order.meetingPoint ?? 'No meeting point was set.'}
-                </Text>
-              </View>
-              {detail.order.buyerNote ? (
-                <View style={{ gap: spacing.xxs }}>
-                  <Text style={typography.caption}>Note</Text>
-                  <Text style={typography.body}>{detail.order.buyerNote}</Text>
-                </View>
-              ) : null}
+              <DetailRow icon="clipboard-check" label="Payment" value="Cash on delivery" />
+              <DetailRow
+                icon="map-pin"
+                label="Meeting point"
+                value={detail.order.meetingPoint ?? 'No meeting point was set.'}
+              />
+              {detail.order.buyerNote ? <DetailRow icon="message-circle" label="Note" value={detail.order.buyerNote} /> : null}
             </Card>
             <Card>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
                 <Avatar name={counterpartName} uri={detail.counterpart.imageUrl} />
-                <Text style={[typography.bodyMedium, { flex: 1 }]}>{counterpartName}</Text>
+                <View style={{ flex: 1, gap: spacing.xxs }}>
+                  <Text style={typography.caption}>{isVendor ? 'Buyer' : 'Shop'}</Text>
+                  <Text style={typography.bodyMedium}>{counterpartName}</Text>
+                </View>
               </View>
+              {detail.conversationId ? (
+                <Button
+                  label="Open chat"
+                  onPress={() =>
+                    router.push({
+                      pathname: '/chat/[conversationId]',
+                      params: { conversationId: detail.conversationId ?? '' },
+                    })
+                  }
+                  size="md"
+                  variant="outline"
+                />
+              ) : (
+                <Text style={typography.bodySmall}>Chat unavailable</Text>
+              )}
             </Card>
-            {detail.conversationId ? (
-              <Button
-                label="Open chat"
-                onPress={() =>
-                  router.push({
-                    pathname: '/chat/[conversationId]',
-                    params: { conversationId: detail.conversationId ?? '' },
-                  })
-                }
-                variant="outline"
-              />
-            ) : (
-              <Text style={[typography.body, { color: colors.textMuted }]}>Chat unavailable</Text>
-            )}
             {actions.length > 0 ? (
               <View style={{ flexDirection: 'row', gap: spacing.sm }}>
                 {actions.map((action) => (

@@ -3,6 +3,7 @@ import { Text, View } from 'react-native';
 import { Button } from '@/components/ui/Button';
 import { Icon, type IconName } from '@/components/ui/Icon';
 import { colors, icon, radius, shadows, spacing, typography } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 type EmptyStateProps = {
   icon: IconName;
@@ -15,6 +16,7 @@ type EmptyStateProps = {
 const circle = icon.xl + spacing.xl;
 
 export function EmptyState({ icon: iconName, title, body, actionLabel, onAction }: EmptyStateProps) {
+  useThemeMode();
   return (
     <View style={{ alignItems: 'center', gap: spacing.md, paddingVertical: spacing.xl }}>
       <View

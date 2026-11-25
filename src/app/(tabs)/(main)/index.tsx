@@ -116,6 +116,9 @@ export default function HomeScreen() {
               name={vendor.name}
               onPress={() => router.push({ pathname: '/shop/[id]', params: { id: vendor.id } })}
               productCount={vendor.productCount}
+              rating={vendor.rating}
+              reviewCount={vendor.reviewCount}
+              verified={vendor.verified}
             />
           ))}
         </HorizontalScroll>

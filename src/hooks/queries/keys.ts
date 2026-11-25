@@ -29,6 +29,12 @@ export const queryKeys = {
     all: ['messages'] as const,
     thread: (conversationId: string) => ['messages', 'thread', conversationId] as const,
   },
+  reviews: {
+    all: ['reviews'] as const,
+    summaries: ['reviews', 'summaries'] as const,
+    shop: (vendorId: string) => ['reviews', 'shop', vendorId] as const,
+    order: (orderId: string) => ['reviews', 'order', orderId] as const,
+  },
   orders: {
     all: ['orders'] as const,
     list: (userId: string, role: OrderRole, filter: OrderListFilter) =>

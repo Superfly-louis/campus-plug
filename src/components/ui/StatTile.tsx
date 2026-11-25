@@ -1,6 +1,7 @@
 import { Text, View } from 'react-native';
 
 import { spacing, typography } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 type StatTileProps = {
   value: string;
@@ -8,6 +9,7 @@ type StatTileProps = {
 };
 
 export function StatTile({ value, label }: StatTileProps) {
+  useThemeMode();
   return (
     <View accessibilityLabel={`${value} ${label}`} style={{ alignItems: 'center', gap: spacing.xxs }}>
       <Text style={typography.h1}>{value}</Text>

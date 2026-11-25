@@ -3,6 +3,7 @@ import { Pressable, View } from 'react-native';
 import { Icon, type IconColor, type IconName } from '@/components/ui/Icon';
 import { GlassSurface, liquidGlassAvailable } from '@/components/ui/GlassSurface';
 import { colors, layout, motion, radius, spacing } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 type IconButtonProps = {
   name: IconName;
@@ -21,6 +22,7 @@ export function IconButton({
   color = 'textPrimary',
   disabled = false,
 }: IconButtonProps) {
+  useThemeMode();
   const glass = liquidGlassAvailable() && !disabled;
 
   if (glass) {
@@ -81,6 +83,7 @@ export function IconButton({
 }
 
 function Dot() {
+  useThemeMode();
   return (
     <View
       accessibilityElementsHidden

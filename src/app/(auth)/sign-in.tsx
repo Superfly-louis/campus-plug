@@ -11,12 +11,14 @@ import { TextField } from '@/components/ui/TextField';
 import { colors, layout, spacing, typography } from '@/constants/theme';
 import { useAuth } from '@/lib/auth';
 import { emailSchema, fieldError } from '@/lib/validation';
+import { useThemeMode } from '@/lib/themeMode';
 
 function shown(error: unknown, fallback: string): string {
   return error instanceof Error && error.message ? error.message : fallback;
 }
 
 export default function SignInScreen() {
+  useThemeMode();
   const { signIn } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

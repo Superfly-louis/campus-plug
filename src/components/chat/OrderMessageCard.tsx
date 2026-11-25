@@ -7,6 +7,7 @@ import { StatusPill } from '@/components/ui/StatusPill';
 import { orderStatus } from '@/constants/orderStatus';
 import { colors, spacing, typography } from '@/constants/theme';
 import { useOrder } from '@/hooks/queries/useOrders';
+import { useThemeMode } from '@/lib/themeMode';
 
 type OrderMessageCardProps = {
   orderId: string | null;
@@ -15,6 +16,7 @@ type OrderMessageCardProps = {
 };
 
 export function OrderMessageCard({ orderId, body, onPress }: OrderMessageCardProps) {
+  useThemeMode();
   const order = useOrder(orderId ?? '');
   const detail = order.data;
   const first = detail?.items[0];

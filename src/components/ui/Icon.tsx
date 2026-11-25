@@ -49,6 +49,7 @@ import {
 import type { ComponentType } from 'react';
 
 import { colors, icon } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 const icons = {
   house: House,
@@ -106,6 +107,7 @@ type IconProps = {
   size?: number;
   color?: IconColor;
   strokeWidth?: number;
+  filled?: boolean;
   accessibilityLabel?: string;
 };
 
@@ -114,14 +116,17 @@ export function Icon({
   size = icon.md,
   color = 'textPrimary',
   strokeWidth = icon.strokeWidth,
+  filled = false,
   accessibilityLabel,
 }: IconProps) {
+  useThemeMode();
   const Glyph = icons[name];
   return (
     <Glyph
       size={size}
       color={colors[color]}
       strokeWidth={strokeWidth}
+      fill={filled ? colors[color] : 'none'}
       accessibilityLabel={accessibilityLabel}
     />
   );

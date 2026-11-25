@@ -5,6 +5,7 @@ import { PromoBanner } from '@/components/marketplace/PromoBanner';
 import { HorizontalScroll } from '@/components/ui/HorizontalScroll';
 import { promos, type PromoAction } from '@/constants/promos';
 import { marketplace, motion, colors, radius, spacing } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 type PromoCarouselProps = {
   onExploreCategory: (slug: string) => void;
@@ -12,6 +13,7 @@ type PromoCarouselProps = {
 };
 
 export function PromoCarousel({ onExploreCategory, onStartSelling }: PromoCarouselProps) {
+  useThemeMode();
   const scrollRef = useRef<ScrollViewInstance>(null);
   const [width, setWidth] = useState(0);
   const [index, setIndex] = useState(0);

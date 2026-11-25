@@ -2,6 +2,7 @@ import { Pressable, Text, View } from 'react-native';
 
 import { Icon } from '@/components/ui/Icon';
 import { colors, icon, layout, limits, motion, radius, spacing, typography } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 type QuantityStepperProps = {
   value: number;
@@ -10,6 +11,7 @@ type QuantityStepperProps = {
 };
 
 export function QuantityStepper({ value, onChange, label }: QuantityStepperProps) {
+  useThemeMode();
   const atMin = value <= 1;
   const atMax = value >= limits.orderQuantityMax;
 

@@ -20,6 +20,7 @@ import type { ChatMessage } from '@/lib/api/messages';
 import { useAuth } from '@/lib/auth';
 import { useOnline } from '@/lib/presence';
 import { formatDayLabel, formatTime } from '@/lib/format';
+import { useThemeMode } from '@/lib/themeMode';
 
 function param(value: string | string[] | undefined): string {
   return Array.isArray(value) ? (value[0] ?? '') : (value ?? '');
@@ -44,6 +45,7 @@ function threadRows(messages: ChatMessage[]): ThreadRow[] {
 }
 
 export default function ChatScreen() {
+  useThemeMode();
   const params = useLocalSearchParams<{ conversationId?: string | string[] }>();
   const conversationId = param(params.conversationId);
   const { session } = useAuth();

@@ -1,5 +1,6 @@
 import { router, useSegments, type Href } from 'expo-router';
 import { createContext, useContext, useEffect, useRef } from 'react';
+import { Platform } from 'react-native';
 import { usePanGesture, type PanGesture } from 'react-native-gesture-handler';
 
 const pages = ['index', 'explore', 'messages', 'orders', 'profile'] as const;
@@ -21,7 +22,8 @@ function tabIndex(segments: readonly string[]): number {
 
 export function useMainTabSwipe(): PanGesture | null {
   const segments: readonly string[] = useSegments();
-  const index = tabIndex(segments);
+  // Android's gesture wrapper uses display:contents, which hides the page.
+  const index = Platform.OS === 'android' ? -1 : tabIndex(segments);
   const indexRef = useRef(index);
   useEffect(() => {
     indexRef.current = index;

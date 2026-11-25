@@ -4,8 +4,10 @@ import { colors } from '@/constants/theme';
 import { useConversations } from '@/hooks/queries/useConversations';
 import { useIncomingPendingCount } from '@/hooks/queries/useOrders';
 import { useAuth } from '@/lib/auth';
+import { useThemeMode } from '@/lib/themeMode';
 
 export default function TabLayout() {
+  useThemeMode();
   const { vendor } = useAuth();
   const incoming = useIncomingPendingCount(vendor?.status === 'approved');
   const incomingCount = incoming.data ?? 0;
@@ -31,7 +33,7 @@ export default function TabLayout() {
         <NativeTabs.Trigger.Icon md="search" sf="magnifyingglass" />
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="messages">
-        <NativeTabs.Trigger.Label>Messages</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>Chats</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon md="chat" sf={{ default: 'message', selected: 'message.fill' }} />
         {unread > 0 ? (
           <NativeTabs.Trigger.Badge>{unread > 99 ? '99+' : String(unread)}</NativeTabs.Trigger.Badge>

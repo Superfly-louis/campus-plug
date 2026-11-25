@@ -9,7 +9,7 @@ import { IconButton } from '@/components/ui/IconButton';
 import { InlineError } from '@/components/ui/InlineError';
 import { ListRow } from '@/components/ui/ListRow';
 import { Screen } from '@/components/ui/Screen';
-import { RefreshSpinner } from '@/components/ui/RefreshSpinner';
+import { refreshControlFor } from '@/components/ui/RefreshSpinner';
 import { useTabBarInset } from '@/components/ui/TabBar';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { spacing, typography } from '@/constants/theme';
@@ -19,6 +19,7 @@ import { toFriendlyError } from '@/lib/errors';
 import { formatDateTime } from '@/lib/format';
 
 import type { Json } from '../../../types/database.types';
+import { useThemeMode } from '@/lib/themeMode';
 
 function textValue(data: Json, key: string): string {
   if (typeof data !== 'object' || data === null || Array.isArray(data)) return '';
@@ -56,6 +57,7 @@ function openNotification(item: AppNotification) {
 }
 
 export default function NotificationsScreen() {
+  useThemeMode();
   const tabInset = useTabBarInset();
   const notifications = useNotifications();
   const markRead = useMarkNotificationRead();
@@ -87,14 +89,12 @@ export default function NotificationsScreen() {
           if (notifications.hasNextPage && !notifications.isFetchingNextPage) void notifications.fetchNextPage();
         }}
         onEndReachedThreshold={0.4}
-        refreshControl={
-          <RefreshSpinner
-            onRefresh={() => {
-              void notifications.refetch();
-            }}
-            refreshing={notifications.isRefetching && !notifications.isFetchingNextPage}
-          />
-        }
+        refreshControl={refreshControlFor({
+          onRefresh: () => {
+            void notifications.refetch();
+          },
+          refreshing: notifications.isRefetching && !notifications.isFetchingNextPage,
+        })}
         ListHeaderComponent={
           <View style={{ gap: spacing.sm, marginBottom: spacing.sm }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>

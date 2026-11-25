@@ -4,7 +4,7 @@ import { Avatar } from '@/components/ui/Avatar';
 import { IconButton } from '@/components/ui/IconButton';
 import { layout, spacing } from '@/constants/theme';
 
-export type AppHeaderVariant = 'home' | 'explore' | 'orders' | 'profile';
+export type AppHeaderVariant = 'home' | 'explore' | 'messages' | 'orders' | 'profile';
 
 type AppHeaderProps = {
   variant: AppHeaderVariant;
@@ -28,7 +28,7 @@ export function AppHeader({
   actionsOnly = false,
 }: AppHeaderProps) {
   const bellLabel = unread ? 'Notifications, unread' : 'Notifications';
-  const showAvatar = variant === 'home' || variant === 'orders';
+  const showAvatar = variant === 'home' || variant === 'orders' || variant === 'messages';
   const actions = (
     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
       <IconButton name="bell" accessibilityLabel={bellLabel} onPress={onBellPress} dot={unread} />

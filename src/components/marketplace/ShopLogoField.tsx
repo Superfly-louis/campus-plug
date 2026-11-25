@@ -3,6 +3,7 @@ import { Pressable, Text, View } from 'react-native';
 
 import { Icon } from '@/components/ui/Icon';
 import { colors, layout, motion, radius, spacing, typography } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 type ShopLogoFieldProps = {
   uri: string | null;
@@ -13,6 +14,7 @@ type ShopLogoFieldProps = {
 const tile = spacing.huge * 2;
 
 export function ShopLogoField({ uri, onPress, disabled = false }: ShopLogoFieldProps) {
+  useThemeMode();
   const label = uri ? 'Change logo' : 'Add logo';
   return (
     <Pressable

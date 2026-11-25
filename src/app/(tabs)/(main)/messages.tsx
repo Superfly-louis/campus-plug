@@ -1,12 +1,14 @@
 import { router } from 'expo-router';
-import { FlatList, Text } from 'react-native';
+import { FlatList, View } from 'react-native';
 
 import { ConversationListState } from '@/components/chat/ChatListState';
 import { ConversationRow } from '@/components/chat/ConversationRow';
-import { RefreshSpinner } from '@/components/ui/RefreshSpinner';
+import { PageHero } from '@/components/ui/PageHero';
+import { refreshControlFor } from '@/components/ui/RefreshSpinner';
 import { Screen } from '@/components/ui/Screen';
+import { ShellHeader } from '@/components/ui/ShellHeader';
 import { useTabBarInset } from '@/components/ui/TabBar';
-import { spacing, typography } from '@/constants/theme';
+import { spacing } from '@/constants/theme';
 import { useConversations, useConversationsRealtime } from '@/hooks/queries/useConversations';
 import { formatDayLabel, formatTime } from '@/lib/format';
 
@@ -24,21 +26,27 @@ export default function MessagesScreen() {
 
   return (
     <Screen>
-      <FlatList contentInsetAdjustmentBehavior="automatic"
-        contentContainerStyle={{ flexGrow: 1, paddingBottom: spacing.xl + tabInset }}
+      <FlatList
+        contentInsetAdjustmentBehavior="never"
+        removeClippedSubviews={false}
+        contentContainerStyle={{ paddingBottom: spacing.xl + tabInset }}
         data={showRows ? rows : []}
         keyExtractor={(item) => item.id}
         style={{ flex: 1 }}
-        refreshControl={
-          <RefreshSpinner
-            onRefresh={() => {
-              void conversations.refetch();
-            }}
-            refreshing={conversations.isRefetching}
-          />
-        }
+        refreshControl={refreshControlFor({
+          onRefresh: () => {
+            void conversations.refetch();
+          },
+          refreshing: conversations.isRefetching,
+        })}
         ListHeaderComponent={
-          <Text style={[typography.h1, { marginBottom: spacing.sm }]}>Messages</Text>
+          <View style={{ marginBottom: spacing.sm }}>
+            <PageHero
+              actions={<ShellHeader actionsOnly variant="messages" />}
+              highlight="Messages"
+              title="Your Messages"
+            />
+          </View>
         }
         ListEmptyComponent={
           <ConversationListState

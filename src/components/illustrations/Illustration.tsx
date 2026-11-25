@@ -6,6 +6,7 @@ import { Icon, type IconName } from '@/components/ui/Icon';
 import { colors, icon, layout, radius } from '@/constants/theme';
 
 import { illustrations, type IllustrationName } from './registry';
+import { useThemeMode } from '@/lib/themeMode';
 
 type IllustrationProps = {
   name: IllustrationName;
@@ -47,6 +48,7 @@ function Placeholder({
   glyph: IconName;
   tint: keyof typeof colors;
 }) {
+  useThemeMode();
   return (
     <View
       accessibilityLabel={labels[name]}
@@ -76,6 +78,7 @@ export function Illustration({
   contentFit = 'contain',
   contentPosition = 'center',
 }: IllustrationProps) {
+  useThemeMode();
   const asset = illustrations[name];
   const displayWidth = fill ? '100%' : (width ?? asset.width);
   const displayHeight = fill

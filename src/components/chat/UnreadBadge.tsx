@@ -1,8 +1,10 @@
 import { Text, View } from 'react-native';
 
 import { colors, radius, spacing, typography } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 export function UnreadBadge({ count }: { count: number }) {
+  useThemeMode();
   if (count <= 0) return null;
   const label = count > 99 ? '99+' : String(count);
   return (
@@ -18,7 +20,7 @@ export function UnreadBadge({ count }: { count: number }) {
         justifyContent: 'center',
       }}
     >
-      <Text style={[typography.caption, { color: colors.textPrimary }]}>{label}</Text>
+      <Text style={[typography.caption, { color: colors.paper }]}>{label}</Text>
     </View>
   );
 }

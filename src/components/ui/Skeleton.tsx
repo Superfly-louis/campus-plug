@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Animated, type DimensionValue, type ViewStyle } from 'react-native';
 
 import { colors, motion, radius, spacing } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 type SkeletonProps = {
   width?: DimensionValue;
@@ -16,6 +17,7 @@ export function Skeleton({
   rounded = 'md',
   style,
 }: SkeletonProps) {
+  useThemeMode();
   const [opacity] = useState(() => new Animated.Value(1));
 
   useEffect(() => {

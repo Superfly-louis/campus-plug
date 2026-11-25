@@ -14,8 +14,10 @@ import { useAuth } from '@/lib/auth';
 import { toFriendlyError } from '@/lib/errors';
 import { compressImage, getImageUrl, pickImages, uploadImage } from '@/lib/images';
 import { fieldError, shopDescriptionSchema, shopNameSchema } from '@/lib/validation';
+import { useThemeMode } from '@/lib/themeMode';
 
 export default function EditShopScreen() {
+  useThemeMode();
   const { vendor, session } = useAuth();
   const updateShop = useUpdateShop();
   const [shopName, setShopName] = useState(vendor?.shop_name ?? '');

@@ -5,6 +5,7 @@ import { Pressable, Text, View } from 'react-native';
 import { Icon } from '@/components/ui/Icon';
 import { promoCardLayout } from '@/constants/promoCard';
 import { fontFamily, icon, promoCard, radius, spacing } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 export type PromoCardProps = {
   label: string;
@@ -29,6 +30,7 @@ export function PromoCard({
   buttonLabel,
   onPress,
 }: PromoCardProps) {
+  useThemeMode();
   return (
     <View
       style={{
@@ -123,6 +125,7 @@ export function PromoCard({
 }
 
 function Headline({ text, highlight }: { text: string; highlight?: string }) {
+  useThemeMode();
   const lines = text.split('\n');
   return (
     <View>

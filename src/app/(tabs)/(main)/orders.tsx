@@ -7,7 +7,7 @@ import { OrderCard } from '@/components/orders/OrderCard';
 import { OrderListState } from '@/components/orders/OrderListState';
 import { SegmentedControl } from '@/components/orders/SegmentedControl';
 import { PageHero } from '@/components/ui/PageHero';
-import { RefreshSpinner } from '@/components/ui/RefreshSpinner';
+import { refreshControlFor } from '@/components/ui/RefreshSpinner';
 import { Screen } from '@/components/ui/Screen';
 import { useTabBarInset } from '@/components/ui/TabBar';
 import { ShellHeader } from '@/components/ui/ShellHeader';
@@ -45,8 +45,10 @@ export default function OrdersScreen() {
 
   return (
     <Screen>
-      <FlatList contentInsetAdjustmentBehavior="automatic"
-        contentContainerStyle={{ flexGrow: 1, paddingBottom: spacing.xl + tabInset }}
+      <FlatList
+        contentInsetAdjustmentBehavior="never"
+        removeClippedSubviews={false}
+        contentContainerStyle={{ paddingBottom: spacing.xl + tabInset }}
         data={showRows ? rows : []}
         keyExtractor={(item) => item.id}
         style={{ flex: 1 }}
@@ -54,14 +56,12 @@ export default function OrdersScreen() {
           if (orders.hasNextPage && !orders.isFetchingNextPage) void orders.fetchNextPage();
         }}
         onEndReachedThreshold={0.4}
-        refreshControl={
-          <RefreshSpinner
-            onRefresh={() => {
-              void orders.refetch();
-            }}
-            refreshing={orders.isRefetching && !orders.isFetchingNextPage}
-          />
-        }
+        refreshControl={refreshControlFor({
+          onRefresh: () => {
+            void orders.refetch();
+          },
+          refreshing: orders.isRefetching && !orders.isFetchingNextPage,
+        })}
         ListHeaderComponent={
           <View style={{ gap: spacing.sm, marginBottom: spacing.sm }}>
             <PageHero

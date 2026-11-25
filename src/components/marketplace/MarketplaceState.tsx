@@ -7,6 +7,7 @@ import { type IconName } from '@/components/ui/Icon';
 import { InlineError } from '@/components/ui/InlineError';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { colors, spacing } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 type MarketplaceStateProps =
   | { status: 'loading'; skeleton?: ReactNode }
@@ -22,6 +23,7 @@ type MarketplaceStateProps =
   | { status: 'ready'; children: ReactNode };
 
 export function MarketplaceState(props: MarketplaceStateProps) {
+  useThemeMode();
   if (props.status === 'loading') {
     return props.skeleton ?? <DefaultSkeleton />;
   }
@@ -48,6 +50,7 @@ export function MarketplaceState(props: MarketplaceStateProps) {
 }
 
 function DefaultSkeleton() {
+  useThemeMode();
   return (
     <View accessibilityLabel="Loading" style={{ gap: spacing.sm }}>
       <Skeleton height={spacing.huge} />
@@ -58,5 +61,6 @@ function DefaultSkeleton() {
 }
 
 export function CoverSkeleton({ height }: { height: number }) {
+  useThemeMode();
   return <Skeleton height={height} rounded="xl" style={{ backgroundColor: colors.surface }} />;
 }

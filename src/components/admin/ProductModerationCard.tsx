@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/Card';
 import { TextField } from '@/components/ui/TextField';
 import { colors, spacing, typography } from '@/constants/theme';
 import type { AdminProduct, ProductModerationStatus } from '@/lib/api/admin';
+import { useThemeMode } from '@/lib/themeMode';
 
 type ProductModerationCardProps = {
   product: AdminProduct;
@@ -38,6 +39,7 @@ export function ProductModerationCard({
   onStartRemove,
   onConfirmRemove,
 }: ProductModerationCardProps) {
+  useThemeMode();
   const shop = product.shopName.trim() || 'Shop';
   const removed = product.status === 'removed_by_admin';
   return (

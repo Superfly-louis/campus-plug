@@ -20,6 +20,7 @@ import { usePlaceOrder } from '@/hooks/queries/useOrders';
 import { useVendorProducts } from '@/hooks/queries/useProducts';
 import { toFriendlyError } from '@/lib/errors';
 import type { OrderSummary } from '@/lib/api/orders';
+import { useThemeMode } from '@/lib/themeMode';
 
 export type SheetLine = {
   productId: string;
@@ -37,6 +38,7 @@ type OrderSheetProps = {
 };
 
 export function OrderSheet({ visible, vendorId, items: initialItems, onClose, onPlaced }: OrderSheetProps) {
+  useThemeMode();
   const insets = useSafeAreaInsets();
   const place = usePlaceOrder();
   const [lines, setLines] = useState(initialItems);

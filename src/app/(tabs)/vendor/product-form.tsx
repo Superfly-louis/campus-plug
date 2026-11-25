@@ -32,6 +32,7 @@ import {
 import { useAuth } from '@/lib/auth';
 import { toFriendlyError } from '@/lib/errors';
 import { compressImage, getImageUrl, pickImages, uploadImage } from '@/lib/images';
+import { useThemeMode } from '@/lib/themeMode';
 import {
   categoryIdSchema,
   fieldError,
@@ -104,6 +105,7 @@ function nextPosition(images: readonly DraftImage[]): number {
 }
 
 export default function ProductFormScreen() {
+  useThemeMode();
   const { vendor, session } = useAuth();
   const params = useLocalSearchParams<{ id?: string | string[] }>();
   const productId = param(params.id);
@@ -180,6 +182,7 @@ function ProductEditor({
   userId: string;
   detail: ProductDetail | null;
 }) {
+  useThemeMode();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const queryClient = useQueryClient();

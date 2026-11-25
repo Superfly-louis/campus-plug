@@ -1,6 +1,7 @@
 import { Pressable, Text, View } from 'react-native';
 
 import { colors, layout, motion, radius, spacing, typography } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 type Segment<T extends string> = { value: T; label: string };
 
@@ -11,6 +12,7 @@ type SegmentedControlProps<T extends string> = {
 };
 
 export function SegmentedControl<T extends string>({ options, value, onChange }: SegmentedControlProps<T>) {
+  useThemeMode();
   return (
     <View
       accessibilityRole="tablist"

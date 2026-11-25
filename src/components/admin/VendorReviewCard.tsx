@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/Card';
 import { TextField } from '@/components/ui/TextField';
 import { colors, spacing, typography } from '@/constants/theme';
 import type { AdminVendor } from '@/lib/api/admin';
+import { useThemeMode } from '@/lib/themeMode';
 
 type VendorReviewCardProps = {
   shop: AdminVendor;
@@ -36,6 +37,7 @@ export function VendorReviewCard({
   onStartReject,
   onConfirmReject,
 }: VendorReviewCardProps) {
+  useThemeMode();
   const owner = shop.ownerName?.trim() || 'Deleted user';
   const removing = mode === 'remove';
   return (

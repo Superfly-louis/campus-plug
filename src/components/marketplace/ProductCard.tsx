@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/Card';
 import { Icon } from '@/components/ui/Icon';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { colors, marketplace, motion, radius, spacing, typography } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 type ProductCardProps = OptionalMetaProps & {
   title: string;
@@ -20,10 +21,12 @@ type ProductCardProps = OptionalMetaProps & {
 };
 
 export function ProductCard(props: ProductCardProps) {
+  useThemeMode();
   return <ProductCardBody {...props} compact={false} />;
 }
 
 export function MiniProductCard(props: ProductCardProps) {
+  useThemeMode();
   return <ProductCardBody {...props} compact />;
 }
 
@@ -42,6 +45,7 @@ function ProductCardBody({
   wished,
   onToggleWishlist,
 }: ProductCardProps & { compact: boolean }) {
+  useThemeMode();
   const imageHeight = compact ? marketplace.miniImageHeight : marketplace.productImageHeight;
   return (
     <Pressable
@@ -107,6 +111,7 @@ function ProductCardBody({
 }
 
 export function ProductCardSkeleton({ compact = false }: { compact?: boolean }) {
+  useThemeMode();
   return (
     <Skeleton
       height={(compact ? marketplace.miniImageHeight : marketplace.productImageHeight) + spacing.huge}

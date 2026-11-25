@@ -2,6 +2,7 @@ import { Pressable, Text, TextInput, View } from 'react-native';
 
 import { Icon } from '@/components/ui/Icon';
 import { colors, icon, layout, motion, radius, spacing, typography } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 type MessageComposerProps = {
   value: string;
@@ -22,6 +23,7 @@ export function MessageComposer({
   disabled = false,
   hint,
 }: MessageComposerProps) {
+  useThemeMode();
   const empty = value.trim().length === 0;
   const blocked = disabled || sending || empty;
 

@@ -2,6 +2,7 @@ import { Pressable, Text, View } from 'react-native';
 
 import { Icon, type IconName } from '@/components/ui/Icon';
 import { colors, icon, layout, motion, radius, spacing, typography } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 type CategoryTileProps = {
   icon: IconName;
@@ -20,6 +21,7 @@ export function CategoryTile({
   onPress,
   accessibilityLabel,
 }: CategoryTileProps) {
+  useThemeMode();
   const name = label.replace('\n', ' ');
 
   return (
@@ -52,7 +54,7 @@ export function CategoryTile({
           backgroundColor: active ? colors.background : colors.primarySoft,
         }}
       >
-        <Icon name={iconName} size={icon.md} color="primary" />
+        <Icon name={iconName} size={icon.md} color="primaryInk" />
       </View>
       <Text
         numberOfLines={1}

@@ -14,8 +14,10 @@ import { useAuth } from '@/lib/auth';
 import { toFriendlyError } from '@/lib/errors';
 import { compressImage, pickImages, uploadImage } from '@/lib/images';
 import { fieldError, shopDescriptionSchema, shopNameSchema } from '@/lib/validation';
+import { useThemeMode } from '@/lib/themeMode';
 
 export default function VendorApplyScreen() {
+  useThemeMode();
   const { vendor, session } = useAuth();
   const createVendor = useCreateVendor();
   const [shopName, setShopName] = useState('');

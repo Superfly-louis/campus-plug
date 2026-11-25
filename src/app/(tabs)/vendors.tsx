@@ -4,15 +4,17 @@ import { FlatList, Text, View } from 'react-native';
 import { MarketplaceState } from '@/components/marketplace/MarketplaceState';
 import { VendorCard, VendorCardSkeleton } from '@/components/marketplace/VendorCard';
 import { Screen } from '@/components/ui/Screen';
-import { RefreshSpinner } from '@/components/ui/RefreshSpinner';
+import { refreshControlFor } from '@/components/ui/RefreshSpinner';
 import { useTabBarInset } from '@/components/ui/TabBar';
 import { spacing, typography } from '@/constants/theme';
 import { useHomeVendors } from '@/hooks/queries/useVendors';
 import { toFriendlyError } from '@/lib/errors';
+import { useThemeMode } from '@/lib/themeMode';
 
 const skeletons = ['one', 'two', 'three', 'four'] as const;
 
 export default function VendorsScreen() {
+  useThemeMode();
   const tabInset = useTabBarInset();
   const home = useHomeVendors();
   const refreshing = home.isRefetching && !home.isPending;
@@ -25,14 +27,12 @@ export default function VendorsScreen() {
         data={home.isPending || home.isError ? [] : home.cards}
         keyExtractor={(vendor) => vendor.id}
         numColumns={2}
-        refreshControl={
-          <RefreshSpinner
-            onRefresh={() => {
-              void home.refetch();
-            }}
-            refreshing={refreshing}
-          />
-        }
+        refreshControl={refreshControlFor({
+          onRefresh: () => {
+            void home.refetch();
+          },
+          refreshing,
+        })}
         renderItem={({ item }) => (
           <View style={{ flex: 1 }}>
             <VendorCard
@@ -44,7 +44,10 @@ export default function VendorsScreen() {
               name={item.name}
               onPress={() => router.push({ pathname: '/shop/[id]', params: { id: item.id } })}
               productCount={item.productCount}
+              rating={item.rating}
+              reviewCount={item.reviewCount}
               variant="explore"
+              verified={item.verified}
             />
           </View>
         )}

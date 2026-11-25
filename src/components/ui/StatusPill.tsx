@@ -2,6 +2,7 @@ import { Text, View } from 'react-native';
 
 import { Icon } from '@/components/ui/Icon';
 import { colors, icon, layout, radius, spacing, typography } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 export type OrderStatus = 'pending' | 'preparing' | 'ready' | 'completed' | 'declined' | 'cancelled';
 
@@ -19,6 +20,7 @@ const labels: Record<OrderStatus, string> = {
 };
 
 export function StatusPill({ status }: StatusPillProps) {
+  useThemeMode();
   const filled = status === 'pending' || status === 'preparing' || status === 'ready';
   const backgroundColor = status === 'pending' ? colors.warning : filled ? colors.violet : 'transparent';
   const borderColor =
@@ -30,7 +32,7 @@ export function StatusPill({ status }: StatusPillProps) {
         ? colors.primary
         : status === 'declined' || status === 'cancelled'
           ? colors.danger
-          : colors.textPrimary;
+          : colors.paper;
 
   return (
     <View

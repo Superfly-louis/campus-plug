@@ -2,6 +2,7 @@ import { Pressable, Text, TextInput, View } from 'react-native';
 
 import { Icon } from '@/components/ui/Icon';
 import { colors, control, icon, layout, motion, radius, spacing, typography } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 type SearchBarProps = {
   value: string;
@@ -21,6 +22,7 @@ export function SearchBar({
   autoFocus = false,
   readOnly = false,
 }: SearchBarProps) {
+  useThemeMode();
   return (
     <View
       style={{

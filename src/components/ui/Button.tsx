@@ -1,7 +1,8 @@
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 
-import { Icon, type IconColor } from '@/components/ui/Icon';
+import { Icon } from '@/components/ui/Icon';
 import { colors, control, icon, layout, motion, radius, spacing, typography } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'dangerOutline';
 type ButtonSize = 'md' | 'lg';
@@ -15,45 +16,6 @@ type ButtonProps = {
   disabled?: boolean;
   trailingArrow?: boolean;
   fullWidth?: boolean;
-};
-
-const tones: Record<ButtonVariant, { fill: string; fillPressed: string; text: IconColor; border: string }> = {
-  primary: {
-    fill: colors.primary,
-    fillPressed: colors.primaryPressed,
-    text: 'textOnPrimary',
-    border: colors.primary,
-  },
-  secondary: {
-    fill: colors.surfaceAlt,
-    fillPressed: colors.indigoDeep,
-    text: 'textPrimary',
-    border: colors.border,
-  },
-  outline: {
-    fill: 'transparent',
-    fillPressed: colors.primarySoft,
-    text: 'primary',
-    border: colors.primary,
-  },
-  ghost: {
-    fill: 'transparent',
-    fillPressed: colors.surfaceAlt,
-    text: 'lilac',
-    border: 'transparent',
-  },
-  danger: {
-    fill: colors.danger,
-    fillPressed: colors.danger,
-    text: 'textPrimary',
-    border: colors.danger,
-  },
-  dangerOutline: {
-    fill: 'transparent',
-    fillPressed: colors.surfaceAlt,
-    text: 'danger',
-    border: colors.danger,
-  },
 };
 
 const heights: Record<ButtonSize, number> = {
@@ -71,7 +33,45 @@ export function Button({
   trailingArrow = false,
   fullWidth = true,
 }: ButtonProps) {
-  const tone = tones[variant];
+  useThemeMode();
+  const tone = {
+    primary: {
+      fill: colors.primary,
+      fillPressed: colors.primaryPressed,
+      text: 'textOnPrimary' as const,
+      border: colors.primary,
+    },
+    secondary: {
+      fill: colors.surfaceAlt,
+      fillPressed: colors.border,
+      text: 'textPrimary' as const,
+      border: colors.border,
+    },
+    outline: {
+      fill: 'transparent',
+      fillPressed: colors.primarySoft,
+      text: 'primary' as const,
+      border: colors.primary,
+    },
+    ghost: {
+      fill: 'transparent',
+      fillPressed: colors.surfaceAlt,
+      text: 'lilac' as const,
+      border: 'transparent',
+    },
+    danger: {
+      fill: colors.danger,
+      fillPressed: colors.danger,
+      text: 'paper' as const,
+      border: colors.danger,
+    },
+    dangerOutline: {
+      fill: 'transparent',
+      fillPressed: colors.surfaceAlt,
+      text: 'danger' as const,
+      border: colors.danger,
+    },
+  }[variant];
   const inactive = disabled || loading;
 
   return (

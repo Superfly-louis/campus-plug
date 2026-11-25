@@ -11,12 +11,14 @@ import { TextField } from '@/components/ui/TextField';
 import { colors, layout, spacing, typography } from '@/constants/theme';
 import { useAuth } from '@/lib/auth';
 import { campusLocationSchema, fullNameSchema, phoneSchema } from '@/lib/validation';
+import { useThemeMode } from '@/lib/themeMode';
 
 function shown(error: unknown, fallback: string): string {
   return error instanceof Error && error.message ? error.message : fallback;
 }
 
 export default function OnboardingScreen() {
+  useThemeMode();
   const { profile, completeOnboarding, signOut } = useAuth();
   const [fullName, setFullName] = useState(profile?.full_name ?? '');
   const [phone, setPhone] = useState(profile?.phone ?? '');

@@ -162,7 +162,10 @@ export default function ExploreScreen() {
               name={vendor.name}
               onPress={() => openShop(vendor.id)}
               productCount={vendor.productCount}
+              rating={vendor.rating}
+              reviewCount={vendor.reviewCount}
               variant="explore"
+              verified={vendor.verified}
             />
           ))}
         </HorizontalScroll>
@@ -177,6 +180,9 @@ export default function ExploreScreen() {
           name={featuredCard.name}
           onPress={() => openShop(featuredCard.id)}
           productCount={featuredCard.productCount}
+          rating={featuredCard.rating}
+          reviewCount={featuredCard.reviewCount}
+          verified={featuredCard.verified}
         />
       ) : null}
       <SectionHeader

@@ -7,10 +7,11 @@ import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaView, type Edges } from 'react-native-safe-area-context';
 
-import { RefreshSpinner } from '@/components/ui/RefreshSpinner';
+import { refreshControlFor } from '@/components/ui/RefreshSpinner';
 import { useTabBarInset } from '@/components/ui/TabBar';
 import { TabSwipeContext, useMainTabSwipe } from '@/components/ui/tabSwipe';
 import { colors, gradients, gradientAxis, layout, spacing } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 type ScreenProps = {
   children: ReactNode;
@@ -31,6 +32,7 @@ export function Screen({
   onRefresh,
   paper = false,
 }: ScreenProps) {
+  useThemeMode();
   const segments: readonly string[] = useSegments();
   const inTabs = segments.includes('(main)');
   const safeEdges: Edges = edges ?? (inTabs ? ['top', 'left', 'right'] : ['top', 'left', 'right', 'bottom']);
@@ -48,8 +50,10 @@ export function Screen({
   const body = (
     <View
       style={{
-        flexGrow: 1,
+        // flexGrow on Android collapses a vertical scroller that also holds a sideways list.
+        flexGrow: scroll ? (Platform.OS === 'android' ? 0 : 1) : 1,
         flex: scroll ? undefined : 1,
+        minHeight: scroll ? undefined : 0,
         padding: padded ? layout.screenPadding : 0,
         gap: spacing.lg,
       }}
@@ -64,11 +68,17 @@ export function Screen({
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
           {scroll ? (
             <ScrollView
-              contentInsetAdjustmentBehavior={inTabs ? 'automatic' : 'never'}
-              contentContainerStyle={{ flexGrow: 1, paddingBottom: tabInset }}
+              style={{ flex: 1 }}
+              nestedScrollEnabled
+              removeClippedSubviews={false}
+              contentInsetAdjustmentBehavior={Platform.OS === 'ios' && inTabs ? 'automatic' : 'never'}
+              contentContainerStyle={{
+                flexGrow: Platform.OS === 'android' ? 0 : 1,
+                paddingBottom: tabInset,
+              }}
               keyboardShouldPersistTaps="handled"
               refreshControl={
-                onRefresh ? <RefreshSpinner onRefresh={onRefresh} refreshing={refreshing} /> : undefined
+                onRefresh ? refreshControlFor({ onRefresh, refreshing }) : undefined
               }
             >
               {body}

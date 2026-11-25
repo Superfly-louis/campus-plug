@@ -900,6 +900,70 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      list_shop_reviews: {
+        Args: { vendor_id: string }
+        Returns: {
+          body: string | null
+          buyer_name: string
+          created_at: string
+          id: string
+          rating: number
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "order_reviews"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      order_review: {
+        Args: { order_id: string }
+        Returns: {
+          body: string | null
+          created_at: string
+          id: string
+          rating: number
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "order_reviews"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      shop_review_summaries: {
+        Args: never
+        Returns: {
+          rating_avg: number
+          review_count: number
+          vendor_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "order_reviews"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      submit_order_review: {
+        Args: { body: string; order_id: string; rating: number }
+        Returns: {
+          body: string | null
+          buyer_id: string
+          buyer_name: string
+          created_at: string
+          id: string
+          order_id: string
+          rating: number
+          vendor_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "order_reviews"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       register_push_token: {
         Args: { platform: string; token: string }
         Returns: undefined

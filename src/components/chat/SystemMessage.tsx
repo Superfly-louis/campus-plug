@@ -1,8 +1,10 @@
 import { Text, View } from 'react-native';
 
 import { colors, radius, spacing, typography } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 export function SystemMessage({ body }: { body: string }) {
+  useThemeMode();
   return (
     <View style={{ alignItems: 'center' }}>
       <View
@@ -21,6 +23,7 @@ export function SystemMessage({ body }: { body: string }) {
 }
 
 export function DateSeparator({ label }: { label: string }) {
+  useThemeMode();
   return (
     <Text accessibilityRole="header" style={[typography.caption, { textAlign: 'center' }]}>
       {label}

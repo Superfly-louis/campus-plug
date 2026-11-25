@@ -12,7 +12,7 @@ import { Icon } from '@/components/ui/Icon';
 import { IconButton } from '@/components/ui/IconButton';
 import { InlineError } from '@/components/ui/InlineError';
 import { Screen } from '@/components/ui/Screen';
-import { RefreshSpinner } from '@/components/ui/RefreshSpinner';
+import { refreshControlFor } from '@/components/ui/RefreshSpinner';
 import { useTabBarInset } from '@/components/ui/TabBar';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { TextField } from '@/components/ui/TextField';
@@ -24,6 +24,7 @@ import { toFriendlyError } from '@/lib/errors';
 import { getImageUrl } from '@/lib/images';
 import { filterPriceSchema } from '@/lib/validation';
 import type { ProductSort } from '@/lib/api/products';
+import { useThemeMode } from '@/lib/themeMode';
 
 const sorts = ['newest', 'price_asc', 'price_desc', 'relevance'] as const;
 
@@ -60,6 +61,7 @@ function filterCount(filters: { categoryId: string | null; minPrice?: number; ma
 }
 
 export default function SearchScreen() {
+  useThemeMode();
   const tabInset = useTabBarInset();
   const params = useLocalSearchParams<{ sort?: string | string[]; category?: string | string[] }>();
   const slug = param(params.category);
@@ -161,14 +163,12 @@ export default function SearchScreen() {
           if (results.hasNextPage && !results.isFetchingNextPage) void results.fetchNextPage();
         }}
         onEndReachedThreshold={0.4}
-        refreshControl={
-          <RefreshSpinner
-            onRefresh={() => {
-              void results.refetch();
-            }}
-            refreshing={results.isRefetching && !results.isPending}
-          />
-        }
+        refreshControl={refreshControlFor({
+          onRefresh: () => {
+            void results.refetch();
+          },
+          refreshing: results.isRefetching && !results.isPending,
+        })}
         renderItem={({ item }) => {
           const match = categories.data?.find((category) => category.id === item.categoryId);
           const visual = match ? categoryVisual(match.slug, match.name) : null;

@@ -2,6 +2,7 @@ import { Pressable, Text, View } from 'react-native';
 
 import { Icon } from '@/components/ui/Icon';
 import { detailFractionDigits, icon, spacing, typography } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 export type OptionalMetaProps = {
   rating?: number;
@@ -18,6 +19,7 @@ export function OptionalMeta({
   wished = false,
   onToggleWishlist,
 }: OptionalMetaProps) {
+  useThemeMode();
   if (rating == null && reviewCount == null && distanceKm == null && !onToggleWishlist) return null;
 
   return (

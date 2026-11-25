@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import {
   campusLocationSchema,
+  emailSchema,
   fullNameSchema,
   parseOrThrow,
   phoneSchema,
@@ -14,6 +15,8 @@ export type ProfileUpdate = {
   campus: string;
   avatarUrl?: string;
 };
+
+export type EmailChange = 'updated' | 'confirm';
 
 export async function updateProfile(input: ProfileUpdate): Promise<void> {
   const userId = await requireUserId();
@@ -31,4 +34,14 @@ export async function updateProfile(input: ProfileUpdate): Promise<void> {
 
   const { error } = await supabase.from('profiles').update(patch).eq('id', userId);
   raiseIfError(error);
+}
+
+export async function updateEmail(email: string): Promise<EmailChange> {
+  const next = parseOrThrow(emailSchema, email).toLowerCase();
+  const { data, error } = await supabase.auth.updateUser({ email: next }, { emailRedirectTo: 'campusplug://' });
+  raiseIfError(error);
+  const current = data.user?.email?.trim().toLowerCase();
+  const pending = data.user?.new_email?.trim().toLowerCase();
+  if (pending && pending !== current) return 'confirm';
+  return 'updated';
 }

@@ -11,7 +11,7 @@ import { Chip } from '@/components/ui/Chip';
 import { IconButton } from '@/components/ui/IconButton';
 import { InlineError } from '@/components/ui/InlineError';
 import { Screen } from '@/components/ui/Screen';
-import { RefreshSpinner } from '@/components/ui/RefreshSpinner';
+import { refreshControlFor } from '@/components/ui/RefreshSpinner';
 import { useTabBarInset } from '@/components/ui/TabBar';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { colors, limits, spacing, typography } from '@/constants/theme';
@@ -21,6 +21,7 @@ import { useAuth } from '@/lib/auth';
 import { toFriendlyError } from '@/lib/errors';
 import { formatDateTime } from '@/lib/format';
 import { getImageUrl } from '@/lib/images';
+import { useThemeMode } from '@/lib/themeMode';
 
 type Area = 'shops' | 'products' | 'audit';
 type Queue = 'pending' | 'approved';
@@ -40,6 +41,7 @@ const productEmpty: Record<AdminProductStatus, { title: string; body: string }> 
 };
 
 export default function DashboardScreen() {
+  useThemeMode();
   const tabInset = useTabBarInset();
   const { profile } = useAuth();
   const [area, setArea] = useState<Area>('shops');
@@ -206,14 +208,12 @@ export default function DashboardScreen() {
             if (audit.hasNextPage && !audit.isFetchingNextPage) void audit.fetchNextPage();
           }}
           onEndReachedThreshold={0.4}
-          refreshControl={
-            <RefreshSpinner
-              onRefresh={() => {
-                void audit.refetch();
-              }}
-              refreshing={audit.isRefetching && !audit.isFetchingNextPage}
-            />
-          }
+          refreshControl={refreshControlFor({
+            onRefresh: () => {
+              void audit.refetch();
+            },
+            refreshing: audit.isRefetching && !audit.isFetchingNextPage,
+          })}
           ListHeaderComponent={heading(null)}
           ListEmptyComponent={
             audit.isPending ? (
@@ -255,14 +255,12 @@ export default function DashboardScreen() {
             if (products.hasNextPage && !products.isFetchingNextPage) void products.fetchNextPage();
           }}
           onEndReachedThreshold={0.4}
-          refreshControl={
-            <RefreshSpinner
-              onRefresh={() => {
-                void products.refetch();
-              }}
-              refreshing={products.isRefetching && !products.isFetchingNextPage}
-            />
-          }
+          refreshControl={refreshControlFor({
+            onRefresh: () => {
+              void products.refetch();
+            },
+            refreshing: products.isRefetching && !products.isFetchingNextPage,
+          })}
           ListHeaderComponent={heading(
             <ScrollView
               horizontal
@@ -326,14 +324,12 @@ export default function DashboardScreen() {
           if (shops.hasNextPage && !shops.isFetchingNextPage) void shops.fetchNextPage();
         }}
         onEndReachedThreshold={0.4}
-        refreshControl={
-          <RefreshSpinner
-            onRefresh={() => {
-              void shops.refetch();
-            }}
-            refreshing={shops.isRefetching && !shops.isFetchingNextPage}
-          />
-        }
+        refreshControl={refreshControlFor({
+          onRefresh: () => {
+            void shops.refetch();
+          },
+          refreshing: shops.isRefetching && !shops.isFetchingNextPage,
+        })}
         ListHeaderComponent={heading(
           <View style={{ gap: spacing.sm }}>
             <SegmentedControl

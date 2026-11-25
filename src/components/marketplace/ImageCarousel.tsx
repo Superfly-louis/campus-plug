@@ -4,6 +4,7 @@ import { ScrollView, View } from 'react-native';
 
 import { Icon } from '@/components/ui/Icon';
 import { colors, marketplace, radius, spacing } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 type ImageCarouselProps = {
   images: readonly string[];
@@ -11,6 +12,7 @@ type ImageCarouselProps = {
 };
 
 export function ImageCarousel({ images, accessibilityLabel = 'Product photos' }: ImageCarouselProps) {
+  useThemeMode();
   const [width, setWidth] = useState(0);
   const [index, setIndex] = useState(0);
   const frames = images.length > 0 ? images : [''];

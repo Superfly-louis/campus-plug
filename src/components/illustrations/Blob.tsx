@@ -2,6 +2,7 @@ import { View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import { colors, decoration } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 type BlobProps = {
   width?: number;
@@ -9,6 +10,7 @@ type BlobProps = {
 };
 
 export function Blob({ width = decoration.blobWidth, height = decoration.blobHeight }: BlobProps) {
+  useThemeMode();
   return (
     <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
       <Svg width={width} height={height} viewBox={`0 0 ${decoration.blobWidth} ${decoration.blobHeight}`}>

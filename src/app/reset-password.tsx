@@ -11,6 +11,7 @@ import { TextField } from '@/components/ui/TextField';
 import { colors, typography } from '@/constants/theme';
 import { useAuth } from '@/lib/auth';
 import { emailSchema, fieldError, otpSchema, passwordSchema } from '@/lib/validation';
+import { useThemeMode } from '@/lib/themeMode';
 
 function shown(error: unknown, fallback: string): string {
   return error instanceof Error && error.message ? error.message : fallback;
@@ -23,6 +24,7 @@ function firstString(value: string | string[] | undefined): string {
 }
 
 export default function ResetPasswordScreen() {
+  useThemeMode();
   const params = useLocalSearchParams<{ email?: string | string[] }>();
   const { recovery, confirmPasswordReset, updatePassword } = useAuth();
   const [email, setEmail] = useState(firstString(params.email));

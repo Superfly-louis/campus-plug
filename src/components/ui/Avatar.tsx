@@ -2,6 +2,7 @@ import { Image } from 'expo-image';
 import { Pressable, Text, View } from 'react-native';
 
 import { colors, control, layout, motion, radius, spacing, typography } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 type AvatarSize = 'md' | 'lg';
 
@@ -27,6 +28,7 @@ function initials(name: string | null | undefined): string {
 }
 
 export function Avatar({ name, uri, size = 'md', online = false, onPress }: AvatarProps) {
+  useThemeMode();
   const dimension = sizes[size];
   const inner = dimension - layout.ringWidth * 2;
   const photo = uri?.trim() ? uri.trim() : null;
@@ -40,7 +42,7 @@ export function Avatar({ name, uri, size = 'md', online = false, onPress }: Avat
         borderRadius: radius.pill,
         borderWidth: layout.ringWidth,
         borderColor: colors.lilac,
-        backgroundColor: colors.indigoDeep,
+        backgroundColor: colors.indigo,
         alignItems: 'center',
         justifyContent: 'center',
       }}
@@ -52,7 +54,7 @@ export function Avatar({ name, uri, size = 'md', online = false, onPress }: Avat
           style={{ width: inner, height: inner, borderRadius: radius.pill }}
         />
       ) : (
-        <Text style={size === 'lg' ? typography.h2 : typography.button}>{initials(name)}</Text>
+        <Text style={[size === 'lg' ? typography.h2 : typography.button, { color: colors.paper }]}>{initials(name)}</Text>
       )}
       {online ? (
         <View

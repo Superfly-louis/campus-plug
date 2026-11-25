@@ -8,6 +8,7 @@ import { orderStatus } from '@/constants/orderStatus';
 import { colors, icon, layout, motion, radius, spacing, typography } from '@/constants/theme';
 import { formatOrderDate } from '@/lib/format';
 import type { OrderListItem, OrderRole } from '@/lib/api/orders';
+import { useThemeMode } from '@/lib/themeMode';
 
 const thumb = spacing.huge + spacing.md;
 
@@ -18,6 +19,7 @@ type OrderCardProps = {
 };
 
 export function OrderCard({ order, role, onPress }: OrderCardProps) {
+  useThemeMode();
   const rawName = role === 'vendor' ? order.buyerName : order.shopName;
   const name = rawName.trim().length > 0 ? rawName : 'Deleted user';
   const title = order.extraCount > 0 ? `${order.firstTitle} + ${order.extraCount} more` : order.firstTitle;

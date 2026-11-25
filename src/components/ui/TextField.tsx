@@ -3,6 +3,7 @@ import { Pressable, Text, TextInput, View, type TextInputProps } from 'react-nat
 
 import { Icon, type IconName } from '@/components/ui/Icon';
 import { colors, icon as iconSize, layout, radius, spacing, typography } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 type TextFieldProps = {
   label?: string;
@@ -43,6 +44,7 @@ export function TextField({
   editable = true,
   multiline = false,
 }: TextFieldProps) {
+  useThemeMode();
   const [focused, setFocused] = useState(false);
   const [hidden, setHidden] = useState(secure);
   const paper = tone === 'paper';

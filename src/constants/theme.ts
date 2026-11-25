@@ -12,7 +12,38 @@ function withAlpha(hex: string, alpha: number): string {
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 }
 
-export const colors = {
+export type ThemeMode = 'dark' | 'light';
+
+export type Palette = {
+  background: string;
+  backgroundDeep: string;
+  surface: string;
+  surfaceAlt: string;
+  indigoDeep: string;
+  indigo: string;
+  violet: string;
+  lilac: string;
+  periwinkle: string;
+  border: string;
+  primary: string;
+  primaryInk: string;
+  primaryPressed: string;
+  textOnPrimary: string;
+  textPrimary: string;
+  textMuted: string;
+  warning: string;
+  danger: string;
+  success: string;
+  info: string;
+  primarySoft: string;
+  overlay: string;
+  paper: string;
+  ink: string;
+  inkMuted: string;
+  dot: string;
+};
+
+const darkPalette: Palette = {
   background: '#061B36',
   backgroundDeep: '#02132C',
   surface: '#0B2542',
@@ -24,6 +55,7 @@ export const colors = {
   periwinkle: '#8A93E8',
   border: '#2F3C8F',
   primary: primaryHex,
+  primaryInk: primaryHex,
   primaryPressed: '#9BDD34',
   textOnPrimary: '#101018',
   textPrimary: '#F5F5F5',
@@ -38,7 +70,29 @@ export const colors = {
   ink: '#3B1578',
   inkMuted: '#5C5670',
   dot: '#D5D0DE',
-} as const;
+};
+
+const lightPalette: Palette = {
+  ...darkPalette,
+  background: '#FFFFFF',
+  backgroundDeep: '#F6F3FB',
+  surface: '#FFFFFF',
+  surfaceAlt: '#F4F0FA',
+  indigoDeep: '#E6DFF8',
+  periwinkle: '#5C5670',
+  border: '#E4DEEF',
+  primaryInk: '#3A6A10',
+  textPrimary: '#1B1233',
+  textMuted: '#5C5670',
+  primarySoft: withAlpha(primaryHex, 0.45),
+};
+
+export const colors: Palette = { ...darkPalette };
+
+const palettes: Record<ThemeMode, Palette> = {
+  dark: darkPalette,
+  light: lightPalette,
+};
 
 export const promoCard = {
   navy: '#071B36',
@@ -137,57 +191,52 @@ export const decoration = {
   curveStroke: 10,
 } as const;
 
-const shadowOpacity = {
-  card: 0.28,
-  glow: 0.55,
-} as const;
+const glowOpacity = 0.55;
+const glowRadius = 18;
+const glowElevation = 10;
 
-const shadowRadius = {
-  card: 12,
-  glow: 18,
-} as const;
-
-const shadowElevation = {
-  card: 4,
-  glow: 10,
-} as const;
-
-const cardShadowOffset = 8;
-
-function shadow(color: string, kind: 'card' | 'glow'): ViewStyle {
-  const isCard = kind === 'card';
-  const blur = isCard ? shadowRadius.card : shadowRadius.glow;
-  const opacity = isCard ? shadowOpacity.card : shadowOpacity.glow;
-  const offsetY = isCard ? cardShadowOffset : 0;
+function glow(color: string): ViewStyle {
   return (
     Platform.select<ViewStyle>({
       ios: {
         shadowColor: color,
-        shadowOffset: { width: 0, height: offsetY },
-        shadowOpacity: opacity,
-        shadowRadius: blur,
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: glowOpacity,
+        shadowRadius: glowRadius,
       },
       android: {
-        elevation: isCard ? shadowElevation.card : shadowElevation.glow,
+        elevation: glowElevation,
         shadowColor: color,
       },
       default: {
-        boxShadow: `0 ${offsetY}px ${blur}px ${color}`,
+        boxShadow: `0 0px ${glowRadius}px ${color}`,
       },
     }) ?? {}
   );
 }
 
-export const shadows = {
-  card: shadow(black, 'card'),
-  glowLime: shadow(colors.primary, 'glow'),
-  glowViolet: shadow(colors.violet, 'glow'),
-} as const;
+const flatCard: ViewStyle =
+  Platform.select<ViewStyle>({
+    ios: {
+      shadowColor: 'transparent',
+      shadowOffset: { width: 0, height: 0 },
+      shadowOpacity: 0,
+      shadowRadius: 0,
+    },
+    android: { elevation: 0 },
+    default: { boxShadow: 'none' },
+  }) ?? {};
 
-export const gradients = {
+export const shadows = {
+  card: flatCard,
+  glowLime: glow(colors.primary),
+  glowViolet: glow(colors.violet),
+};
+
+export const gradients: { banner: [string, string]; screen: [string, string] } = {
   banner: [colors.indigoDeep, colors.backgroundDeep],
   screen: [colors.background, colors.backgroundDeep],
-} as const;
+};
 
 export const fontFamily = {
   jakartaSemiBold: 'PlusJakartaSans_600SemiBold',
@@ -226,7 +275,31 @@ export const typography = {
     letterSpacing: eyebrowLetterSpacing,
     textTransform: 'uppercase',
   }),
-} as const;
+};
+
+export function applyTheme(mode: ThemeMode) {
+  const next = palettes[mode];
+  (Object.keys(next) as (keyof Palette)[]).forEach((key) => {
+    colors[key] = next[key];
+  });
+  gradients.banner = [colors.indigoDeep, colors.backgroundDeep];
+  gradients.screen = [colors.background, colors.backgroundDeep];
+  typography.hero = text(fontFamily.jakartaExtraBold, 34, 40, colors.textPrimary);
+  typography.wordmark = text(fontFamily.jakartaExtraBold, 24, 30, colors.textPrimary);
+  typography.display = text(fontFamily.jakartaBold, 28, 34, colors.textPrimary);
+  typography.h1 = text(fontFamily.jakartaBold, 24, 30, colors.textPrimary);
+  typography.h2 = text(fontFamily.jakartaSemiBold, 18, 24, colors.textPrimary);
+  typography.price = text(fontFamily.jakartaBold, 17, 22, colors.primary);
+  typography.body = text(fontFamily.dmRegular, 15, 22, colors.textPrimary);
+  typography.bodyMedium = text(fontFamily.dmMedium, 15, 22, colors.textPrimary);
+  typography.button = text(fontFamily.dmSemiBold, 14, 20, colors.textPrimary);
+  typography.bodySmall = text(fontFamily.dmRegular, 13, 18, colors.textMuted);
+  typography.caption = text(fontFamily.dmRegular, 12, 16, colors.textMuted);
+  typography.eyebrow = text(fontFamily.dmSemiBold, 12, 16, colors.lilac, {
+    letterSpacing: eyebrowLetterSpacing,
+    textTransform: 'uppercase',
+  });
+}
 
 export const query = {
   staleTimeMs: 30_000,
@@ -262,6 +335,7 @@ export const limits = {
   meetingPointMin: 2,
   meetingPointMax: 120,
   orderNoteMax: 300,
+  reviewBodyMax: 300,
   messagePageSize: 30,
   orderPageSize: 15,
   notificationPageSize: 20,

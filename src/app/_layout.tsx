@@ -17,6 +17,7 @@ import { AuthProvider, useAuth } from '@/lib/auth';
 import { entryPath } from '@/lib/entry';
 import { IntroProvider, useIntro } from '@/lib/intro';
 import { PresenceProvider } from '@/lib/presence';
+import { ThemeModeProvider, useThemeMode } from '@/lib/themeMode';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 
 SplashScreen.preventAutoHideAsync();
@@ -66,14 +67,22 @@ export default function RootLayout() {
 
   return (
     <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <IntroProvider>{app}</IntroProvider>
-      </QueryClientProvider>
+      <ThemeModeProvider>
+        <QueryClientProvider client={queryClient}>
+          <IntroProvider>{app}</IntroProvider>
+        </QueryClientProvider>
+      </ThemeModeProvider>
     </ErrorBoundary>
   );
 }
 
+function ThemeStatus() {
+  const { mode } = useThemeMode();
+  return <StatusBar style={mode === 'light' ? 'dark' : 'light'} />;
+}
+
 function SetupRequired({ fontsReady }: { fontsReady: boolean }) {
+  useThemeMode();
   useEffect(() => {
     if (fontsReady) void SplashScreen.hideAsync();
   }, [fontsReady]);
@@ -82,7 +91,7 @@ function SetupRequired({ fontsReady }: { fontsReady: boolean }) {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      <StatusBar style="light" />
+      <ThemeStatus />
       <Screen>
         <Text style={typography.h1}>Connect Supabase</Text>
         <Text style={[typography.body, { color: colors.textMuted }]}>
@@ -95,6 +104,7 @@ function SetupRequired({ fontsReady }: { fontsReady: boolean }) {
 }
 
 function RootNavigator({ fontsReady }: { fontsReady: boolean }) {
+  useThemeMode();
   const { ready, session, profile, profileComplete, profileError, linkError, clearLinkError, recovery, refreshProfile, signOut } =
     useAuth();
   const intro = useIntro();
@@ -109,13 +119,13 @@ function RootNavigator({ fontsReady }: { fontsReady: boolean }) {
     signedIn: Boolean(session),
     recovery,
     profileComplete,
-    introSeen: intro.seen,
+    introSeen: intro.seen === true,
   });
 
   if (session && !profile) {
     return (
       <View style={{ flex: 1, backgroundColor: colors.background }}>
-        <StatusBar style="light" />
+        <ThemeStatus />
         <OfflineBanner />
         <Screen>
           <Text style={typography.h1}>Profile unavailable</Text>
@@ -129,7 +139,7 @@ function RootNavigator({ fontsReady }: { fontsReady: boolean }) {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      <StatusBar style="light" />
+      <ThemeStatus />
       <OfflineBanner />
       {linkError ? (
         <Pressable

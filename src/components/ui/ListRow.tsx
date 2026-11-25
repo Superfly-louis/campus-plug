@@ -3,6 +3,7 @@ import { Pressable, Text, View } from 'react-native';
 import { UnreadBadge } from '@/components/chat/UnreadBadge';
 import { Icon, type IconName } from '@/components/ui/Icon';
 import { colors, layout, motion, radius, spacing, typography } from '@/constants/theme';
+import { useThemeMode } from '@/lib/themeMode';
 
 type ListRowProps = {
   icon: IconName;
@@ -23,6 +24,7 @@ export function ListRow({
   highlighted = false,
   onPress,
 }: ListRowProps) {
+  useThemeMode();
   const unread = highlighted ? ', unread' : '';
   const label =
     badge > 0

@@ -15,10 +15,12 @@ export function HorizontalScroll({ ref, ...props }: HorizontalScrollProps) {
   const scroll = (
     <ScrollView
       nestedScrollEnabled
+      removeClippedSubviews={false}
       showsHorizontalScrollIndicator={false}
       {...props}
       ref={ref}
       horizontal
+      style={[{ flexGrow: 0 }, props.style]}
     />
   );
 
