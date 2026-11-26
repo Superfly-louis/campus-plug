@@ -29,6 +29,7 @@ function textValue(data: Json, key: string): string {
 
 function iconFor(type: string): IconName {
   if (type === 'message') return 'message-circle';
+  if (type === 'buyer_request' || type === 'request_removed') return 'shopping-bag';
   if (type === 'order_placed' || type === 'order_status') return 'clipboard-check';
   if (type === 'vendor_reviewed' || type === 'vendor_removed') return 'store';
   if (type === 'product_moderated') return 'package';
@@ -45,6 +46,11 @@ function openNotification(item: AppNotification) {
   }
   if (item.type === 'message' && conversationId) {
     router.push({ pathname: '/chat/[conversationId]', params: { conversationId } });
+    return;
+  }
+  const requestId = textValue(item.data, 'request_id');
+  if ((item.type === 'buyer_request' || item.type === 'request_removed') && requestId) {
+    router.push({ pathname: '/requests/[id]', params: { id: requestId } });
     return;
   }
   if (item.type === 'vendor_reviewed' || item.type === 'vendor_removed') {

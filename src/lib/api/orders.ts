@@ -1,5 +1,10 @@
 import { limits } from '@/constants/theme';
-import { statusesForFilter, type OrderListFilter } from '@/constants/orderStatus';
+import {
+  statusesForFilter,
+  type DbPaymentMethod,
+  type DbPaymentStatus,
+  type OrderListFilter,
+} from '@/constants/orderStatus';
 import { getImageUrl } from '@/lib/images';
 import { supabase } from '@/lib/supabase';
 import { orderSheetSchema, parseOrThrow } from '@/lib/validation';
@@ -25,6 +30,9 @@ export type OrderSummary = {
   shopName: string;
   buyerNote: string | null;
   meetingPoint: string | null;
+  paymentMethod: DbPaymentMethod;
+  paymentStatus: DbPaymentStatus;
+  paymentDueAt: string | null;
 };
 
 export type OrderListItem = OrderSummary & {
@@ -57,11 +65,14 @@ export type OrderDetail = {
   counterpart: OrderCounterpart;
 };
 
+export type CheckoutPaymentMethod = 'cash_on_delivery' | 'paystack';
+
 export type PlaceOrderInput = {
   vendorId: string;
   items: { productId: string; quantity: number }[];
   meetingPoint: string;
   note: string;
+  paymentMethod?: CheckoutPaymentMethod;
 };
 
 type ItemRow = {
@@ -92,12 +103,15 @@ type ListedOrder = {
   shop_name_snapshot: string;
   buyer_note: string | null;
   meeting_point: string | null;
+  payment_method: DbPaymentMethod;
+  payment_status: DbPaymentStatus;
+  payment_due_at: string | null;
   order_items: ItemRow[] | null;
   vendors: ShopEmbed | ShopEmbed[] | null;
 };
 
 const listColumns =
-  'id, status, total_amount, created_at, updated_at, buyer_id, vendor_id, vendor_user_id, conversation_id, buyer_name_snapshot, shop_name_snapshot, buyer_note, meeting_point, order_items(id, title_snapshot, quantity, unit_price, product_id, created_at), vendors(shop_name, logo_url)';
+  'id, status, total_amount, created_at, updated_at, buyer_id, vendor_id, vendor_user_id, conversation_id, buyer_name_snapshot, shop_name_snapshot, buyer_note, meeting_point, payment_method, payment_status, payment_due_at, order_items(id, title_snapshot, quantity, unit_price, product_id, created_at), vendors(shop_name, logo_url)';
 
 function shopOf(value: ShopEmbed | ShopEmbed[] | null): ShopEmbed | null {
   if (value == null) return null;
@@ -120,6 +134,9 @@ function toSummary(order: Tables<'orders'> | ListedOrder): OrderSummary {
     shopName: order.shop_name_snapshot,
     buyerNote: order.buyer_note,
     meetingPoint: order.meeting_point,
+    paymentMethod: order.payment_method,
+    paymentStatus: order.payment_status,
+    paymentDueAt: order.payment_due_at,
   };
 }
 
@@ -245,6 +262,7 @@ export async function placeOrder(input: PlaceOrderInput): Promise<OrderSummary> 
     items,
     buyer_note: parsed.note ?? '',
     meeting_point: parsed.meetingPoint,
+    p_payment_method: input.paymentMethod ?? 'cash_on_delivery',
   });
   raiseIfError(error);
   return toSummary(requireData(data));

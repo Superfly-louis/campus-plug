@@ -1,10 +1,14 @@
 import { router, useLocalSearchParams } from 'expo-router';
+import * as Linking from 'expo-linking';
 import { useState } from 'react';
 import { Alert, Text, View } from 'react-native';
 
 import { OrderReviewCard } from '@/components/orders/OrderReviewCard';
 import { OrderTimeline } from '@/components/orders/OrderTimeline';
 import { OrderDetailState } from '@/components/orders/OrderListState';
+import { OrderPayment } from '@/components/orders/OrderPayment';
+import { useVendorCharges } from '@/hooks/queries/useCharges';
+import { formatPesewas } from '@/lib/format';
 import { PriceText } from '@/components/marketplace/PriceText';
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
@@ -14,7 +18,8 @@ import { IconButton } from '@/components/ui/IconButton';
 import { InlineError } from '@/components/ui/InlineError';
 import { Screen } from '@/components/ui/Screen';
 import { StatusPill } from '@/components/ui/StatusPill';
-import { actionStatus, orderStatus, type DbOrderStatus, type OrderAction } from '@/constants/orderStatus';
+import { actionStatus, orderPaymentLabel, orderStatus, type DbOrderStatus, type OrderAction } from '@/constants/orderStatus';
+import { SUPPORT_URL } from '@/constants/config';
 import { colors, icon, layout, radius, spacing, typography } from '@/constants/theme';
 import { useAuth } from '@/lib/auth';
 import { toFriendlyError } from '@/lib/errors';
@@ -110,13 +115,32 @@ export default function OrderDetailScreen() {
   const userId = session?.user.id;
   const isVendor = Boolean(userId && detail?.order.vendorUserId === userId);
   const isBuyer = Boolean(userId && detail?.order.buyerId === userId);
+  const paidOnline =
+    detail?.order.paymentMethod === 'paystack' &&
+    (detail.order.paymentStatus === 'paid' || detail.order.paymentStatus === 'refund_pending');
+  const cancelWasAvailable =
+    isVendor && detail != null && orderStatus[detail.order.status].vendorActions.includes('cancel');
   const actions = detail
-    ? isVendor
-      ? orderStatus[detail.order.status].vendorActions
-      : isBuyer
-        ? orderStatus[detail.order.status].buyerActions
-        : []
+    ? (isVendor
+        ? orderStatus[detail.order.status].vendorActions
+        : isBuyer
+          ? orderStatus[detail.order.status].buyerActions
+          : []
+      ).filter((action) => !(action === 'cancel' && paidOnline))
     : [];
+  const waitingForPayment =
+    isVendor &&
+    detail?.order.paymentMethod === 'paystack' &&
+    detail.order.status === 'accepted' &&
+    detail.order.paymentStatus !== 'paid' &&
+    detail.order.paymentStatus !== 'refunded' &&
+    detail.order.paymentStatus !== 'refund_pending';
+  const cashChargeVendorId =
+    isVendor && detail?.order.paymentMethod === 'cash_on_delivery' && detail.order.status === 'completed'
+      ? detail.order.vendorId
+      : null;
+  const cashCharges = useVendorCharges(cashChargeVendorId);
+  const cashCharge = cashCharges.data?.find((charge) => charge.orderId === detail?.order.id) ?? null;
 
   function confirm(action: OrderAction) {
     if (!detail) return;
@@ -177,11 +201,30 @@ export default function OrderDetailScreen() {
                 <Text style={[typography.h2, { flex: 1 }]}>{heading}</Text>
                 <StatusPill status={orderStatus[detail.order.status].pill} />
               </View>
-              <Text style={typography.bodySmall}>{progressCopy[detail.order.status][isVendor ? 'vendor' : 'buyer']}</Text>
+              <Text style={typography.bodySmall}>
+                {waitingForPayment
+                  ? 'Waiting for the buyer to pay.'
+                  : isBuyer &&
+                      detail.order.paymentMethod === 'paystack' &&
+                      detail.order.status === 'accepted' &&
+                      detail.order.paymentStatus === 'unpaid'
+                    ? 'Pay now to confirm your order.'
+                    : progressCopy[detail.order.status][isVendor ? 'vendor' : 'buyer']}
+              </Text>
             </View>
             <Card>
               <OrderTimeline status={detail.order.status} />
             </Card>
+            <OrderPayment isBuyer={isBuyer} isVendor={isVendor} order={detail.order} />
+            {cashCharge ? (
+              <Card>
+                <Text style={typography.body}>
+                  {cashCharge.status === 'collected'
+                    ? `Platform charge ${formatPesewas(cashCharge.amountPesewas)}. Taken from an online payout.`
+                    : `Platform charge ${formatPesewas(cashCharge.amountPesewas)}. It comes out of your next online payout.`}
+                </Text>
+              </Card>
+            ) : null}
             {isBuyer && detail.order.status === 'completed' ? <OrderReviewCard orderId={detail.order.id} /> : null}
             <Card>
               {detail.items.length === 0 ? (
@@ -204,7 +247,7 @@ export default function OrderDetailScreen() {
               </View>
             </Card>
             <Card>
-              <DetailRow icon="clipboard-check" label="Payment" value="Cash on delivery" />
+              <DetailRow icon="clipboard-check" label="Payment" value={orderPaymentLabel(detail.order.paymentMethod, detail.order.paymentStatus)} />
               <DetailRow
                 icon="map-pin"
                 label="Meeting point"
@@ -241,7 +284,7 @@ export default function OrderDetailScreen() {
                 {actions.map((action) => (
                   <View key={action} style={{ flex: 1 }}>
                     <Button
-                      disabled={busy != null}
+                      disabled={busy != null || (action === 'ready' && waitingForPayment)}
                       label={action === 'cancel' && isVendor ? 'Cancel' : actionLabels[action]}
                       loading={busy === action}
                       onPress={() => confirm(action)}
@@ -250,6 +293,18 @@ export default function OrderDetailScreen() {
                   </View>
                 ))}
               </View>
+            ) : null}
+            {waitingForPayment ? <Text style={typography.bodySmall}>Waiting for payment</Text> : null}
+            {paidOnline && cancelWasAvailable ? (
+              SUPPORT_URL ? (
+                <Button
+                  label="Contact support to cancel a paid order"
+                  onPress={() => void Linking.openURL(SUPPORT_URL)}
+                  variant="outline"
+                />
+              ) : (
+                <Text style={typography.body}>Contact support to cancel a paid order</Text>
+              )
             ) : null}
             {actionError ? <InlineError message={actionError} /> : null}
           </View>

@@ -59,6 +59,80 @@ export type Database = {
           },
         ]
       }
+      buyer_requests: {
+        Row: {
+          body: string | null
+          buyer_id: string
+          buyer_name: string
+          campus: string
+          category_id: string
+          created_at: string
+          id: string
+          removal_reason: string | null
+          status: string
+          target_vendor_id: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body?: string | null
+          buyer_id: string
+          buyer_name: string
+          campus: string
+          category_id: string
+          created_at?: string
+          id?: string
+          removal_reason?: string | null
+          status?: string
+          target_vendor_id?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string | null
+          buyer_id?: string
+          buyer_name?: string
+          campus?: string
+          category_id?: string
+          created_at?: string
+          id?: string
+          removal_reason?: string | null
+          status?: string
+          target_vendor_id?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "buyer_requests_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "buyer_requests_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "buyer_requests_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "buyer_requests_target_vendor_id_fkey"
+            columns: ["target_vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           created_at: string
@@ -202,6 +276,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "messages_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders_needing_refund"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "messages_sender_id_fkey"
             columns: ["sender_id"]
             isOneToOne: false
@@ -329,10 +410,86 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders_needing_refund"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "order_items_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_reviews: {
+        Row: {
+          body: string | null
+          buyer_id: string
+          buyer_name: string
+          created_at: string
+          id: string
+          order_id: string
+          rating: number
+          vendor_id: string
+        }
+        Insert: {
+          body?: string | null
+          buyer_id: string
+          buyer_name: string
+          created_at?: string
+          id?: string
+          order_id: string
+          rating: number
+          vendor_id: string
+        }
+        Update: {
+          body?: string | null
+          buyer_id?: string
+          buyer_name?: string
+          created_at?: string
+          id?: string
+          order_id?: string
+          rating?: number
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_reviews_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_reviews_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_reviews_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_reviews_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "orders_needing_refund"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_reviews_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
             referencedColumns: ["id"]
           },
         ]
@@ -346,6 +503,7 @@ export type Database = {
           created_at: string
           id: string
           meeting_point: string | null
+          payment_due_at: string | null
           payment_method: Database["public"]["Enums"]["payment_method"]
           payment_provider: string | null
           payment_reference: string | null
@@ -365,6 +523,7 @@ export type Database = {
           created_at?: string
           id?: string
           meeting_point?: string | null
+          payment_due_at?: string | null
           payment_method?: Database["public"]["Enums"]["payment_method"]
           payment_provider?: string | null
           payment_reference?: string | null
@@ -384,6 +543,7 @@ export type Database = {
           created_at?: string
           id?: string
           meeting_point?: string | null
+          payment_due_at?: string | null
           payment_method?: Database["public"]["Enums"]["payment_method"]
           payment_provider?: string | null
           payment_reference?: string | null
@@ -439,6 +599,166 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      payment_events: {
+        Row: {
+          event_type: string
+          id: string
+          payload: Json
+          processed_at: string | null
+          received_at: string
+          reference: string
+          result: string | null
+        }
+        Insert: {
+          event_type: string
+          id?: string
+          payload?: Json
+          processed_at?: string | null
+          received_at?: string
+          reference: string
+          result?: string | null
+        }
+        Update: {
+          event_type?: string
+          id?: string
+          payload?: Json
+          processed_at?: string | null
+          received_at?: string
+          reference?: string
+          result?: string | null
+        }
+        Relationships: []
+      }
+      payments: {
+        Row: {
+          access_code: string | null
+          amount_pesewas: number
+          authorization_url: string | null
+          buyer_id: string | null
+          channel: string | null
+          commission_percent: number | null
+          created_at: string
+          currency: string
+          id: string
+          needs_refund: boolean
+          order_id: string | null
+          paid_at: string | null
+          paystack_fee_pesewas: number | null
+          platform_fee_pesewas: number | null
+          provider: string
+          reference: string
+          status: string
+          updated_at: string
+          vendor_amount_pesewas: number | null
+          vendor_user_id: string | null
+        }
+        Insert: {
+          access_code?: string | null
+          amount_pesewas: number
+          authorization_url?: string | null
+          buyer_id?: string | null
+          channel?: string | null
+          commission_percent?: number | null
+          created_at?: string
+          currency?: string
+          id?: string
+          needs_refund?: boolean
+          order_id?: string | null
+          paid_at?: string | null
+          paystack_fee_pesewas?: number | null
+          platform_fee_pesewas?: number | null
+          provider?: string
+          reference: string
+          status?: string
+          updated_at?: string
+          vendor_amount_pesewas?: number | null
+          vendor_user_id?: string | null
+        }
+        Update: {
+          access_code?: string | null
+          amount_pesewas?: number
+          authorization_url?: string | null
+          buyer_id?: string | null
+          channel?: string | null
+          commission_percent?: number | null
+          created_at?: string
+          currency?: string
+          id?: string
+          needs_refund?: boolean
+          order_id?: string | null
+          paid_at?: string | null
+          paystack_fee_pesewas?: number | null
+          platform_fee_pesewas?: number | null
+          provider?: string
+          reference?: string
+          status?: string
+          updated_at?: string
+          vendor_amount_pesewas?: number | null
+          vendor_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders_needing_refund"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_vendor_user_id_fkey"
+            columns: ["vendor_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_vendor_user_id_fkey"
+            columns: ["vendor_user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      platform_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
       }
       product_images: {
         Row: {
@@ -616,6 +936,72 @@ export type Database = {
           },
         ]
       }
+      request_offers: {
+        Row: {
+          conversation_id: string
+          created_at: string
+          id: string
+          note: string
+          request_id: string
+          vendor_id: string
+          vendor_user_id: string
+        }
+        Insert: {
+          conversation_id: string
+          created_at?: string
+          id?: string
+          note: string
+          request_id: string
+          vendor_id: string
+          vendor_user_id: string
+        }
+        Update: {
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          note?: string
+          request_id?: string
+          vendor_id?: string
+          vendor_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "request_offers_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "request_offers_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "buyer_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "request_offers_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "request_offers_vendor_user_id_fkey"
+            columns: ["vendor_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "request_offers_vendor_user_id_fkey"
+            columns: ["vendor_user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       storage_cleanup_queue: {
         Row: {
           attempts: number
@@ -643,6 +1029,86 @@ export type Database = {
         }
         Relationships: []
       }
+      vendor_charges: {
+        Row: {
+          amount_pesewas: number
+          created_at: string
+          id: string
+          order_id: string
+          payment_id: string | null
+          status: string
+          vendor_id: string
+        }
+        Insert: {
+          amount_pesewas: number
+          created_at?: string
+          id?: string
+          order_id: string
+          payment_id?: string | null
+          status?: string
+          vendor_id: string
+        }
+        Update: {
+          amount_pesewas?: number
+          created_at?: string
+          id?: string
+          order_id?: string
+          payment_id?: string | null
+          status?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_charges_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_charges_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_billing: {
+        Row: {
+          customer_code: string | null
+          last_reference: string | null
+          subaccount_code: string | null
+          subscription_code: string | null
+          updated_at: string
+          vendor_id: string
+        }
+        Insert: {
+          customer_code?: string | null
+          last_reference?: string | null
+          subaccount_code?: string | null
+          subscription_code?: string | null
+          updated_at?: string
+          vendor_id: string
+        }
+        Update: {
+          customer_code?: string | null
+          last_reference?: string | null
+          subaccount_code?: string | null
+          subscription_code?: string | null
+          updated_at?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_billing_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: true
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vendors: {
         Row: {
           created_at: string
@@ -656,7 +1122,9 @@ export type Database = {
           reviewed_by: string | null
           shop_name: string
           status: Database["public"]["Enums"]["vendor_status"]
+          subscription_status: string
           updated_at: string
+          verified_until: string | null
         }
         Insert: {
           created_at?: string
@@ -670,7 +1138,9 @@ export type Database = {
           reviewed_by?: string | null
           shop_name: string
           status?: Database["public"]["Enums"]["vendor_status"]
+          subscription_status?: string
           updated_at?: string
+          verified_until?: string | null
         }
         Update: {
           created_at?: string
@@ -684,7 +1154,9 @@ export type Database = {
           reviewed_by?: string | null
           shop_name?: string
           status?: Database["public"]["Enums"]["vendor_status"]
+          subscription_status?: string
           updated_at?: string
+          verified_until?: string | null
         }
         Relationships: [
           {
@@ -719,6 +1191,106 @@ export type Database = {
       }
     }
     Views: {
+      orders_needing_refund: {
+        Row: {
+          buyer_id: string | null
+          buyer_name_snapshot: string | null
+          conversation_id: string | null
+          created_at: string | null
+          id: string | null
+          needs_refund: boolean | null
+          payment_due_at: string | null
+          payment_method: Database["public"]["Enums"]["payment_method"] | null
+          payment_reference: string | null
+          payment_status: Database["public"]["Enums"]["payment_status"] | null
+          shop_name_snapshot: string | null
+          status: Database["public"]["Enums"]["order_status"] | null
+          total_amount: number | null
+          updated_at: string | null
+          vendor_id: string | null
+          vendor_user_id: string | null
+        }
+        Insert: {
+          buyer_id?: string | null
+          buyer_name_snapshot?: string | null
+          conversation_id?: string | null
+          created_at?: string | null
+          id?: string | null
+          needs_refund?: never
+          payment_due_at?: string | null
+          payment_method?: Database["public"]["Enums"]["payment_method"] | null
+          payment_reference?: string | null
+          payment_status?: Database["public"]["Enums"]["payment_status"] | null
+          shop_name_snapshot?: string | null
+          status?: Database["public"]["Enums"]["order_status"] | null
+          total_amount?: number | null
+          updated_at?: string | null
+          vendor_id?: string | null
+          vendor_user_id?: string | null
+        }
+        Update: {
+          buyer_id?: string | null
+          buyer_name_snapshot?: string | null
+          conversation_id?: string | null
+          created_at?: string | null
+          id?: string | null
+          needs_refund?: never
+          payment_due_at?: string | null
+          payment_method?: Database["public"]["Enums"]["payment_method"] | null
+          payment_reference?: string | null
+          payment_status?: Database["public"]["Enums"]["payment_status"] | null
+          shop_name_snapshot?: string | null
+          status?: Database["public"]["Enums"]["order_status"] | null
+          total_amount?: number | null
+          updated_at?: string | null
+          vendor_id?: string | null
+          vendor_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_vendor_user_id_fkey"
+            columns: ["vendor_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_vendor_user_id_fkey"
+            columns: ["vendor_user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       public_profiles: {
         Row: {
           avatar_url: string | null
@@ -739,6 +1311,35 @@ export type Database = {
       }
     }
     Functions: {
+      admin_cancel_paid_order: {
+        Args: { order_id: string; reason: string }
+        Returns: {
+          buyer_id: string | null
+          buyer_name_snapshot: string
+          buyer_note: string | null
+          conversation_id: string | null
+          created_at: string
+          id: string
+          meeting_point: string | null
+          payment_due_at: string | null
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          payment_provider: string | null
+          payment_reference: string | null
+          payment_status: Database["public"]["Enums"]["payment_status"]
+          shop_name_snapshot: string
+          status: Database["public"]["Enums"]["order_status"]
+          total_amount: number
+          updated_at: string
+          vendor_id: string | null
+          vendor_user_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_moderate_product: {
         Args: {
           new_status: Database["public"]["Enums"]["product_status"]
@@ -766,6 +1367,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_remove_request: {
+        Args: { reason: string; request_id: string }
+        Returns: undefined
+      }
       admin_remove_vendor: {
         Args: { reason: string; vendor_id: string }
         Returns: {
@@ -780,7 +1385,9 @@ export type Database = {
           reviewed_by: string | null
           shop_name: string
           status: Database["public"]["Enums"]["vendor_status"]
+          subscription_status: string
           updated_at: string
+          verified_until: string | null
         }
         SetofOptions: {
           from: "*"
@@ -803,7 +1410,9 @@ export type Database = {
           reviewed_by: string | null
           shop_name: string
           status: Database["public"]["Enums"]["vendor_status"]
+          subscription_status: string
           updated_at: string
+          verified_until: string | null
         }
         SetofOptions: {
           from: "*"
@@ -811,6 +1420,35 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      auto_cancel_unpaid_orders: { Args: never; Returns: number }
+      buyer_request_feed: {
+        Args: {
+          campus_name: string
+          category_id: string
+          only_buyer: boolean
+          open_only: boolean
+          request_id: string
+        }
+        Returns: {
+          body: string
+          buyer_id: string
+          buyer_name: string
+          campus: string
+          category_id: string
+          category_name: string
+          category_slug: string
+          created_at: string
+          id: string
+          mine: boolean
+          offer_count: number
+          offered: boolean
+          removal_reason: string
+          status: string
+          target_shop_name: string
+          target_vendor_id: string
+          title: string
+        }[]
       }
       claim_push_notifications: {
         Args: { notification_id?: string }
@@ -839,6 +1477,16 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      close_buyer_request: { Args: { request_id: string }; Returns: undefined }
+      create_buyer_request: {
+        Args: {
+          body?: string
+          category_id: string
+          title: string
+          vendor_id?: string
+        }
+        Returns: string
+      }
       deactivate_push_token: { Args: { token: string }; Returns: undefined }
       dispatch_edge_function: {
         Args: { function_name: string; payload: Json; secret_name: string }
@@ -858,20 +1506,203 @@ export type Database = {
         Args: { stored_value: string; target_bucket: string }
         Returns: undefined
       }
+      finalize_payment_failure: {
+        Args: { reason: string; reference: string }
+        Returns: {
+          access_code: string | null
+          amount_pesewas: number
+          authorization_url: string | null
+          buyer_id: string | null
+          channel: string | null
+          commission_percent: number | null
+          created_at: string
+          currency: string
+          id: string
+          needs_refund: boolean
+          order_id: string | null
+          paid_at: string | null
+          paystack_fee_pesewas: number | null
+          platform_fee_pesewas: number | null
+          provider: string
+          reference: string
+          status: string
+          updated_at: string
+          vendor_amount_pesewas: number | null
+          vendor_user_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "payments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      finalize_payment_success: {
+        Args: {
+          amount_pesewas: number
+          channel: string
+          currency: string
+          fees: Json
+          reference: string
+        }
+        Returns: {
+          access_code: string | null
+          amount_pesewas: number
+          authorization_url: string | null
+          buyer_id: string | null
+          channel: string | null
+          commission_percent: number | null
+          created_at: string
+          currency: string
+          id: string
+          needs_refund: boolean
+          order_id: string | null
+          paid_at: string | null
+          paystack_fee_pesewas: number | null
+          platform_fee_pesewas: number | null
+          provider: string
+          reference: string
+          status: string
+          updated_at: string
+          vendor_amount_pesewas: number | null
+          vendor_user_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "payments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      get_buyer_request: {
+        Args: { request_id: string }
+        Returns: {
+          body: string
+          buyer_id: string
+          buyer_name: string
+          campus: string
+          category_id: string
+          category_name: string
+          category_slug: string
+          created_at: string
+          id: string
+          mine: boolean
+          offer_count: number
+          offered: boolean
+          removal_reason: string
+          status: string
+          target_shop_name: string
+          target_vendor_id: string
+          title: string
+        }[]
+      }
+      get_public_payment_terms: {
+        Args: never
+        Returns: {
+          commission_percent: number | null
+          min_online_order_ghs: number | null
+        }[]
+      }
       get_or_create_conversation: {
         Args: { vendor_id: string }
         Returns: string
       }
       is_admin: { Args: never; Returns: boolean }
+      list_campus_requests: {
+        Args: { filter_category_id?: string }
+        Returns: {
+          body: string
+          buyer_id: string
+          buyer_name: string
+          campus: string
+          category_id: string
+          category_name: string
+          category_slug: string
+          created_at: string
+          id: string
+          mine: boolean
+          offer_count: number
+          offered: boolean
+          removal_reason: string
+          status: string
+          target_shop_name: string
+          target_vendor_id: string
+          title: string
+        }[]
+      }
+      list_campus_shops: {
+        Args: never
+        Returns: {
+          id: string
+          shop_name: string
+        }[]
+      }
+      list_my_requests: {
+        Args: never
+        Returns: {
+          body: string
+          buyer_id: string
+          buyer_name: string
+          campus: string
+          category_id: string
+          category_name: string
+          category_slug: string
+          created_at: string
+          id: string
+          mine: boolean
+          offer_count: number
+          offered: boolean
+          removal_reason: string
+          status: string
+          target_shop_name: string
+          target_vendor_id: string
+          title: string
+        }[]
+      }
+      list_request_offers: {
+        Args: { request_id: string }
+        Returns: {
+          conversation_id: string
+          created_at: string
+          id: string
+          note: string
+          shop_name: string
+          vendor_id: string
+        }[]
+      }
+      list_shop_reviews: {
+        Args: { vendor_id: string }
+        Returns: {
+          body: string
+          buyer_name: string
+          created_at: string
+          id: string
+          rating: number
+        }[]
+      }
       mark_conversation_read: {
         Args: { conversation_id: string }
         Returns: undefined
+      }
+      offer_on_request: {
+        Args: { note: string; request_id: string }
+        Returns: string
+      }
+      order_review: {
+        Args: { order_id: string }
+        Returns: {
+          body: string
+          created_at: string
+          id: string
+          rating: number
+        }[]
       }
       place_order: {
         Args: {
           buyer_note: string
           items: Json
           meeting_point: string
+          p_payment_method?: string
           vendor_id: string
         }
         Returns: {
@@ -882,6 +1713,7 @@ export type Database = {
           created_at: string
           id: string
           meeting_point: string | null
+          payment_due_at: string | null
           payment_method: Database["public"]["Enums"]["payment_method"]
           payment_provider: string | null
           payment_reference: string | null
@@ -896,70 +1728,6 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "orders"
-          isOneToOne: true
-          isSetofReturn: false
-        }
-      }
-      list_shop_reviews: {
-        Args: { vendor_id: string }
-        Returns: {
-          body: string | null
-          buyer_name: string
-          created_at: string
-          id: string
-          rating: number
-        }[]
-        SetofOptions: {
-          from: "*"
-          to: "order_reviews"
-          isOneToOne: false
-          isSetofReturn: true
-        }
-      }
-      order_review: {
-        Args: { order_id: string }
-        Returns: {
-          body: string | null
-          created_at: string
-          id: string
-          rating: number
-        }[]
-        SetofOptions: {
-          from: "*"
-          to: "order_reviews"
-          isOneToOne: false
-          isSetofReturn: true
-        }
-      }
-      shop_review_summaries: {
-        Args: never
-        Returns: {
-          rating_avg: number
-          review_count: number
-          vendor_id: string
-        }[]
-        SetofOptions: {
-          from: "*"
-          to: "order_reviews"
-          isOneToOne: false
-          isSetofReturn: true
-        }
-      }
-      submit_order_review: {
-        Args: { body: string; order_id: string; rating: number }
-        Returns: {
-          body: string | null
-          buyer_id: string
-          buyer_name: string
-          created_at: string
-          id: string
-          order_id: string
-          rating: number
-          vendor_id: string
-        }
-        SetofOptions: {
-          from: "*"
-          to: "order_reviews"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -986,9 +1754,36 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      shop_review_summaries: {
+        Args: never
+        Returns: {
+          rating_avg: number
+          review_count: number
+          vendor_id: string
+        }[]
+      }
       storage_object_path: {
         Args: { stored_value: string; target_bucket: string }
         Returns: string
+      }
+      submit_order_review: {
+        Args: { body: string; order_id: string; rating: number }
+        Returns: {
+          body: string | null
+          buyer_id: string
+          buyer_name: string
+          created_at: string
+          id: string
+          order_id: string
+          rating: number
+          vendor_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "order_reviews"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       update_order_status: {
         Args: {
@@ -1003,6 +1798,7 @@ export type Database = {
           created_at: string
           id: string
           meeting_point: string | null
+          payment_due_at: string | null
           payment_method: Database["public"]["Enums"]["payment_method"]
           payment_provider: string | null
           payment_reference: string | null
@@ -1032,8 +1828,14 @@ export type Database = {
         | "completed"
         | "rejected"
         | "cancelled"
-      payment_method: "cash_on_delivery" | "mobile_money" | "card"
-      payment_status: "unpaid" | "pending" | "paid" | "failed" | "refunded"
+      payment_method: "cash_on_delivery" | "mobile_money" | "card" | "paystack"
+      payment_status:
+        | "unpaid"
+        | "pending"
+        | "paid"
+        | "failed"
+        | "refunded"
+        | "refund_pending"
       product_status: "active" | "hidden" | "removed_by_admin"
       push_status: "pending" | "sent" | "failed" | "skipped"
       user_role: "buyer" | "vendor" | "admin"
@@ -1186,8 +1988,15 @@ export const Constants = {
         "rejected",
         "cancelled",
       ],
-      payment_method: ["cash_on_delivery", "mobile_money", "card"],
-      payment_status: ["unpaid", "pending", "paid", "failed", "refunded"],
+      payment_method: ["cash_on_delivery", "mobile_money", "card", "paystack"],
+      payment_status: [
+        "unpaid",
+        "pending",
+        "paid",
+        "failed",
+        "refunded",
+        "refund_pending",
+      ],
       product_status: ["active", "hidden", "removed_by_admin"],
       push_status: ["pending", "sent", "failed", "skipped"],
       user_role: ["buyer", "vendor", "admin"],

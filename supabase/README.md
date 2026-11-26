@@ -27,6 +27,12 @@ The app client is `src/lib/supabase.ts`. Copy `.env.example` to `.env` and fill 
 npx supabase functions deploy send-push
 npx supabase functions deploy process-storage-cleanup
 npx supabase functions deploy delete-account
+npx supabase functions deploy paystack-checkout
+npx supabase functions deploy paystack-webhook
+npx supabase functions deploy create-payment
+npx supabase functions deploy verify-payment
+npx supabase functions deploy payments-sweep
+npx supabase functions deploy payout-account
 ```
 
 ## Environment variables and secrets
@@ -42,6 +48,11 @@ Never commit a secret. The service role key stays in the hosted function environ
 | `SUPABASE_SERVICE_ROLE_KEY` | Edge Functions, injected | Bypasses RLS. Never put this in the app |
 | `PUSH_WEBHOOK_SECRET` | `supabase secrets set` | `send-push` checks header `x-webhook-secret` |
 | `CLEANUP_WEBHOOK_SECRET` | `supabase secrets set` | `process-storage-cleanup` checks the same header |
+| `PAYSTACK_SECRET_KEY` | `supabase secrets set` | Paystack secret key. Test and live keys are separate. Never put it in the app |
+| `PAYSTACK_PLAN_CODE` | `supabase secrets set` | Monthly verification plan, `PLN_...` |
+| `PAYSTACK_WEBHOOK_SIGNING_SECRET` | `supabase secrets set` | `whsec_...` from Developers, then API configuration. Required only when events send `Paystack-Signature` |
+| `PAYMENT_RETURN_URL` | `supabase secrets set` | Optional. HTTPS page Paystack opens after checkout. If unset, Paystack shows its own finished page |
+| `PAYMENTS_SWEEP_SECRET` | `supabase secrets set` | `payments-sweep` checks header `x-webhook-secret` |
 
 Vault secrets, created in the SQL editor. Use the same secret strings as the function secrets above.
 
@@ -49,14 +60,16 @@ Vault secrets, created in the SQL editor. Use the same secret strings as the fun
 select vault.create_secret('https://<project-ref>.supabase.co', 'project_url', 'API URL, no trailing path');
 select vault.create_secret('<long random string>', 'push_webhook_secret', 'send-push shared secret');
 select vault.create_secret('<long random string>', 'cleanup_webhook_secret', 'storage cleanup shared secret');
+select vault.create_secret('<long random string>', 'payments_sweep_secret', 'payments-sweep shared secret');
 ```
 
 ```bash
 npx supabase secrets set PUSH_WEBHOOK_SECRET=<push_webhook_secret value>
 npx supabase secrets set CLEANUP_WEBHOOK_SECRET=<cleanup_webhook_secret value>
+npx supabase secrets set PAYMENTS_SWEEP_SECRET=<payments_sweep_secret value>
 ```
 
-Until those Vault rows exist, the cron jobs and the notification insert trigger do nothing. A notification insert then calls `send-push` for that row. `pg_cron` sweeps push every minute and storage cleanup every 10 minutes. Do not also add a Dashboard database webhook on `notifications`, or each insert sends twice.
+Until those Vault rows exist, the cron jobs and the notification insert trigger do nothing. A notification insert then calls `send-push` for that row. `pg_cron` sweeps push every minute, storage cleanup every 10 minutes, and pending Paystack order payments every 5 minutes. Do not also add a Dashboard database webhook on `notifications`, or each insert sends twice.
 
 ## Roles
 

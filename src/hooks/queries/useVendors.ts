@@ -6,6 +6,7 @@ import { marketplace } from '@/constants/theme';
 import { useAuth } from '@/lib/auth';
 import { getImageUrl } from '@/lib/images';
 import { vendorHomeMeta } from '@/lib/api/products';
+import { shopIsVerified } from '@/lib/verification';
 import {
   createVendor,
   getOwnVendor,
@@ -67,7 +68,7 @@ export function useHomeVendors() {
         coverUrl: getImageUrl('product-images', item?.coverPath),
         logoUrl: getImageUrl('shop-logos', vendor.logo_url),
         isNew: Number.isFinite(created) && openedAt - created >= 0 && openedAt - created < marketplace.newVendorMs,
-        verified: vendor.status === 'approved',
+        verified: shopIsVerified(vendor),
         rating: reviewed ? summary.rating : undefined,
         reviewCount: reviewed ? summary.reviewCount : undefined,
       };

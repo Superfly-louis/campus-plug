@@ -17,6 +17,8 @@ Follow the Campus Plug build checklist. Do not start a later phase while an earl
 7. Inspection — buyer, vendor, and admin on two phones; advisors; no service role in the app.
 8. Release prep — `app.json` identity, EAS profiles, privacy URLs, store listings.
 9. Opening day — vendors first, then buyers.
-10. After launch — rank feedback, then v2 (Paystack, alarms, events, requests, vendor monetization).
+10. After launch — rank feedback, then v2 (Paystack, alarms, events, vendor monetization). Buyer requests are part of v1.
 
 MVP stays cash on delivery, currency GHS. Stop after a phase gate and report what is still open.
+
+When payments start, vendor verification is a Paystack monthly subscription in GHS. Admin approval stays free and is what lets a shop list. The verified badge shows only when the shop is approved and the subscription is active. An Edge Function webhook is the only writer of that status. The app opens Paystack checkout and never stores card or Mobile Money details. A failed payment keeps the shop and its products, hides the badge, and allows a short grace period before the badge drops. Start with one monthly price, not tiers. Do not take a cut of cash-on-delivery orders.

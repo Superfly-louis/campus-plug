@@ -1,10 +1,11 @@
 import { Pressable, Text, View } from 'react-native';
 
 import { PriceText } from '@/components/marketplace/PriceText';
+import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { StatusPill } from '@/components/ui/StatusPill';
-import { orderStatus } from '@/constants/orderStatus';
+import { cardPaymentLabel, orderStatus } from '@/constants/orderStatus';
 import { colors, spacing, typography } from '@/constants/theme';
 import { useOrder } from '@/hooks/queries/useOrders';
 import { useThemeMode } from '@/lib/themeMode';
@@ -22,6 +23,7 @@ export function OrderMessageCard({ orderId, body, onPress }: OrderMessageCardPro
   const first = detail?.items[0];
   const extra = detail ? Math.max(detail.items.length - 1, 0) : 0;
   const summary = first ? (extra > 0 ? `${first.title} + ${extra} more` : first.title) : body;
+  const paymentLabel = detail ? cardPaymentLabel(detail.order.paymentMethod, detail.order.paymentStatus) : null;
 
   return (
     <Pressable
@@ -38,7 +40,10 @@ export function OrderMessageCard({ orderId, body, onPress }: OrderMessageCardPro
         {detail ? (
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing.sm }}>
             <PriceText amount={detail.order.totalAmount} />
-            <StatusPill status={orderStatus[detail.order.status].pill} />
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
+              {paymentLabel ? <Badge label={paymentLabel} /> : null}
+              <StatusPill status={orderStatus[detail.order.status].pill} />
+            </View>
           </View>
         ) : null}
         {order.isError || (order.isSuccess && !detail) ? (

@@ -18,6 +18,7 @@ import { useProfileStats } from '@/hooks/useProfileStats';
 import { useAuth } from '@/lib/auth';
 import { getImageUrl } from '@/lib/images';
 import { useThemeMode } from '@/lib/themeMode';
+import { shopIsVerified } from '@/lib/verification';
 
 export default function ProfileScreen() {
   useThemeMode();
@@ -28,7 +29,9 @@ export default function ProfileScreen() {
   const name = profile?.full_name?.trim() ?? '';
   const campus = profile?.campus_location?.trim() ?? '';
   const approved = vendor?.status === 'approved';
-  const roleLabel = profile?.role === 'admin' ? 'Admin' : approved ? 'Verified Vendor' : null;
+  const verified = shopIsVerified(vendor);
+  const roleLabel =
+    profile?.role === 'admin' ? 'Admin' : verified ? 'Verified Vendor' : approved ? 'Approved' : null;
   const tiles = [
     stats.orders != null ? { value: String(stats.orders), label: 'Orders' } : null,
     stats.listings != null ? { value: String(stats.listings), label: 'Listings' } : null,
@@ -64,7 +67,7 @@ export default function ProfileScreen() {
           {name ? (
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
               <Text style={typography.h1}>{name}</Text>
-              {approved ? <Icon color="violet" name="badge-check" size={icon.sm} /> : null}
+              {verified ? <Icon color="violet" name="badge-check" size={icon.sm} /> : null}
             </View>
           ) : null}
           {campus ? (

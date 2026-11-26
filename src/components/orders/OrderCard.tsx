@@ -2,9 +2,10 @@ import { Image } from 'expo-image';
 import { Pressable, Text, View } from 'react-native';
 
 import { PriceText } from '@/components/marketplace/PriceText';
+import { Badge } from '@/components/ui/Badge';
 import { Icon } from '@/components/ui/Icon';
 import { StatusPill } from '@/components/ui/StatusPill';
-import { orderStatus } from '@/constants/orderStatus';
+import { cardPaymentLabel, orderStatus } from '@/constants/orderStatus';
 import { colors, icon, layout, motion, radius, spacing, typography } from '@/constants/theme';
 import { formatOrderDate } from '@/lib/format';
 import type { OrderListItem, OrderRole } from '@/lib/api/orders';
@@ -24,6 +25,7 @@ export function OrderCard({ order, role, onPress }: OrderCardProps) {
   const name = rawName.trim().length > 0 ? rawName : 'Deleted user';
   const title = order.extraCount > 0 ? `${order.firstTitle} + ${order.extraCount} more` : order.firstTitle;
   const when = formatOrderDate(order.createdAt);
+  const paymentLabel = cardPaymentLabel(order.paymentMethod, order.paymentStatus);
 
   return (
     <Pressable
@@ -74,6 +76,7 @@ export function OrderCard({ order, role, onPress }: OrderCardProps) {
         </Text>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
           <PriceText amount={order.totalAmount} />
+          {paymentLabel ? <Badge label={paymentLabel} /> : null}
           {when ? <Text style={[typography.caption, { color: colors.textMuted }]}>{when}</Text> : null}
         </View>
       </View>

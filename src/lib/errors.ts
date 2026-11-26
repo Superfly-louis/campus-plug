@@ -113,6 +113,110 @@ export function toFriendlyError(error: unknown): string {
   if (message.includes('could not find the function') && message.includes('review')) {
     return 'Reviews are not ready yet. Run the reviews SQL, then try again.';
   }
+  if (message.includes('could not find the function') && message.includes('request')) {
+    return 'Requests are not ready yet. Run the requests SQL, then try again.';
+  }
+  if (message.includes('say what you need')) {
+    return 'Say what you need.';
+  }
+  if (message.includes('title is too long')) {
+    return `Use at most ${limits.requestTitleMax} characters.`;
+  }
+  if (message.includes('request note is too long')) {
+    return `Use at most ${limits.requestBodyMax} characters.`;
+  }
+  if (message.includes('add your name before posting a request')) {
+    return 'Add your name before posting a request.';
+  }
+  if (message.includes('add your campus before posting a request')) {
+    return 'Add your campus in Settings before posting a request.';
+  }
+  if (message.includes('you already have 3 open requests')) {
+    return 'You already have 3 open requests. Close one before posting another.';
+  }
+  if (message.includes('you cannot request from your own shop')) {
+    return 'You cannot request something from your own shop.';
+  }
+  if (message.includes('that shop is not on your campus')) {
+    return 'That shop is not on your campus.';
+  }
+  if (message.includes('you need an approved shop to offer')) {
+    return 'An approved shop on this campus can offer.';
+  }
+  if (message.includes('you cannot offer on your own request')) {
+    return 'You cannot offer on your own request.';
+  }
+  if (message.includes('you already offered on this request')) {
+    return 'You already offered on this request.';
+  }
+  if (message.includes('tell the buyer how you can help')) {
+    return 'Tell the buyer how you can help.';
+  }
+  if (message.includes('offer note is too long')) {
+    return `Use at most ${limits.requestOfferMax} characters.`;
+  }
+  if (message.includes('this request is no longer open')) {
+    return 'This request is no longer open.';
+  }
+  if (message.includes('only the buyer can close this request')) {
+    return 'Only the buyer can close this request.';
+  }
+  if (message.includes('this request is already closed')) {
+    return 'This request is already closed.';
+  }
+  if (message.includes('a reason is required to remove a request')) {
+    return 'Add a reason before removing this request.';
+  }
+  if (message.includes('this request was already removed')) {
+    return 'This request was already removed.';
+  }
+  if (message.includes('request not found')) {
+    return 'That request could not be found.';
+  }
+  if (message.includes('could not open conversation')) {
+    return 'The chat could not be opened. Try again.';
+  }
+  if (message.includes('get_public_payment_terms')) {
+    return 'Online payment terms are not ready yet.';
+  }
+  if (message.includes('you need an approved shop to add a payout account')) {
+    return 'An approved shop can add a payout account.';
+  }
+  if (message.includes('that account could not be found')) {
+    return 'That account could not be found. Check the bank and account number.';
+  }
+  if (message.includes('confirm the account name')) {
+    return 'Confirm the account name and try again.';
+  }
+  if (message.includes('could not save payout account') || message.includes('paystack could not save that account')) {
+    return 'Paystack could not save that account. Try again.';
+  }
+  if (message.includes('the bank list could not be loaded')) {
+    return 'The bank list could not be loaded. Try again.';
+  }
+  if (message.includes('check the bank and account number')) {
+    return 'Check the bank and account number.';
+  }
+  if (message.includes('this shop cannot take online payments yet')) {
+    return 'This shop is not ready for online payments.';
+  }
+  if (message.includes('online orders must be at least')) {
+    const raw = readRaw(error, 'message');
+    const amount = raw.match(/GHS\s+[0-9]+(?:\.[0-9]+)?/i);
+    return amount ? `Online orders must be at least ${amount[0]}.` : 'This order is below the minimum for online payment.';
+  }
+  if (message.includes('the payment window has closed')) {
+    return 'The payment window has closed.';
+  }
+  if (message.includes('this order is not waiting for payment')) {
+    return 'This order cannot be paid right now.';
+  }
+  if (message.includes('this shop cannot take this online payment')) {
+    return 'This shop cannot take this online payment. Choose cash on delivery, or ask the vendor.';
+  }
+  if (message.includes('payment verification pending') || message.includes('payment is still confirming')) {
+    return 'Payment is still confirming.';
+  }
   if (message.includes('you cannot order from your own shop')) {
     return 'You cannot order from your own shop.';
   }

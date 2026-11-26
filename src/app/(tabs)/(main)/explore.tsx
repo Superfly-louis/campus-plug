@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { CategoryRow } from '@/components/marketplace/CategoryRow';
 import { FeaturedCard } from '@/components/marketplace/FeaturedCard';
@@ -8,6 +8,7 @@ import { MarketplaceState } from '@/components/marketplace/MarketplaceState';
 import { MiniProductCard, ProductCardSkeleton } from '@/components/marketplace/ProductCard';
 import { PromoCarousel } from '@/components/marketplace/PromoCarousel';
 import { VendorCard, VendorCardSkeleton } from '@/components/marketplace/VendorCard';
+import { Icon } from '@/components/ui/Icon';
 import { PageHero } from '@/components/ui/PageHero';
 import { HorizontalScroll } from '@/components/ui/HorizontalScroll';
 import { Screen } from '@/components/ui/Screen';
@@ -17,7 +18,7 @@ import { ShellHeader } from '@/components/ui/ShellHeader';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { categoryVisual } from '@/constants/categories';
 import { FEATURED_VENDOR_ID } from '@/constants/config';
-import { marketplace, spacing } from '@/constants/theme';
+import { colors, icon, layout, marketplace, radius, spacing, typography } from '@/constants/theme';
 import { useCategories } from '@/hooks/queries/useCategories';
 import { useProductSearch, useVendorIdsInCategory } from '@/hooks/queries/useProducts';
 import { useHomeVendors, useVendor } from '@/hooks/queries/useVendors';
@@ -25,6 +26,7 @@ import { useAuth } from '@/lib/auth';
 import { toFriendlyError } from '@/lib/errors';
 import { getImageUrl } from '@/lib/images';
 import { sellEntry } from '@/lib/sell';
+import { useThemeMode } from '@/lib/themeMode';
 
 const previewSkeletons = ['one', 'two', 'three'] as const;
 
@@ -45,6 +47,7 @@ function openSearch(slug: string) {
 }
 
 export default function ExploreScreen() {
+  useThemeMode();
   const { vendor } = useAuth();
   const params = useLocalSearchParams<{ category?: string | string[] }>();
   const slug = param(params.category);
@@ -101,6 +104,24 @@ export default function ExploreScreen() {
               value=""
             />
           </View>
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Requests"
+          onPress={() => router.push('/requests')}
+          style={({ pressed }) => ({
+            minHeight: layout.minTouchTarget,
+            borderRadius: radius.pill,
+            backgroundColor: pressed ? colors.primaryPressed : colors.primary,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: spacing.xs,
+            paddingHorizontal: spacing.md,
+          })}
+        >
+          <Icon color="textOnPrimary" name="shopping-bag" size={icon.md} />
+          <Text style={[typography.button, { color: colors.textOnPrimary }]}>Requests</Text>
         </Pressable>
       </View>
       {categories.isPending ? (

@@ -1,10 +1,11 @@
 import { Text } from 'react-native';
 
-import { formatPrice } from '@/lib/format';
+import { formatPesewas, formatPrice } from '@/lib/format';
 import { typography } from '@/constants/theme';
 import { useThemeMode } from '@/lib/themeMode';
 
-export function PriceText({ amount }: { amount: number }) {
+export function PriceText({ amount, pesewas }: { amount?: number; pesewas?: number }) {
   useThemeMode();
-  return <Text style={typography.price}>{formatPrice(amount)}</Text>;
+  const text = pesewas != null ? formatPesewas(pesewas) : formatPrice(amount ?? 0);
+  return <Text style={typography.price}>{text}</Text>;
 }

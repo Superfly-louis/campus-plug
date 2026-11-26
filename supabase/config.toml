@@ -381,6 +381,24 @@ verify_jwt = false
 [functions.delete-account]
 verify_jwt = true
 
+[functions.paystack-checkout]
+verify_jwt = true
+
+[functions.paystack-webhook]
+verify_jwt = false
+
+[functions.create-payment]
+verify_jwt = true
+
+[functions.verify-payment]
+verify_jwt = true
+
+[functions.payments-sweep]
+verify_jwt = false
+
+[functions.payout-account]
+verify_jwt = true
+
 [edge_runtime]
 enabled = true
 # Supported request policies: `oneshot`, `per_worker`.

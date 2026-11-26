@@ -68,6 +68,7 @@ export function useUpdateOrderStatus() {
     mutationFn: (input: { orderId: string; status: DbOrderStatus }) => updateOrderStatus(input.orderId, input.status),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.orders.all });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.charges.all });
     },
     onError: async (error) => {
       if (!isOrderStatusConflict(error)) return;
@@ -83,6 +84,8 @@ export function useOrdersRealtime(): void {
   const active = useRealtimeActive();
   const refresh = useCallback(() => {
     void queryClient.invalidateQueries({ queryKey: queryKeys.orders.all });
+    void queryClient.invalidateQueries({ queryKey: queryKeys.payments.all });
+    void queryClient.invalidateQueries({ queryKey: queryKeys.charges.all });
   }, [queryClient]);
   const setup = useCallback(
     (channel: RealtimeChannel) => {

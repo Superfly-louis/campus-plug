@@ -136,6 +136,30 @@ export const reviewBodySchema = z
   .trim()
   .max(limits.reviewBodyMax, `Use at most ${limits.reviewBodyMax} characters.`);
 
+export const requestTitleSchema = z
+  .string()
+  .trim()
+  .min(limits.requestTitleMin, 'Say what you need.')
+  .max(limits.requestTitleMax, `Use at most ${limits.requestTitleMax} characters.`);
+
+export const requestBodySchema = z
+  .string()
+  .trim()
+  .max(limits.requestBodyMax, `Use at most ${limits.requestBodyMax} characters.`)
+  .transform((value) => (value.length === 0 ? null : value));
+
+export const requestOfferSchema = z
+  .string()
+  .trim()
+  .min(1, 'Tell the buyer how you can help.')
+  .max(limits.requestOfferMax, `Use at most ${limits.requestOfferMax} characters.`);
+
+export const requestRemovalSchema = z
+  .string()
+  .trim()
+  .min(1, 'Add a reason before removing this request.')
+  .max(limits.moderationReasonMax, `Use at most ${limits.moderationReasonMax} characters.`);
+
 export const orderNoteSchema = z
   .string()
   .trim()

@@ -23,6 +23,7 @@ import { useAuth } from '@/lib/auth';
 import { toFriendlyError } from '@/lib/errors';
 import { getImageUrl } from '@/lib/images';
 import { useThemeMode } from '@/lib/themeMode';
+import { shopIsVerified } from '@/lib/verification';
 
 function param(value: string | string[] | undefined): string {
   return Array.isArray(value) ? (value[0] ?? '') : (value ?? '');
@@ -141,7 +142,7 @@ export default function ProductScreen() {
             {detail.product.description ? <Text style={typography.body}>{detail.product.description}</Text> : null}
             <Pressable
               accessibilityLabel={
-                detail.vendor.status === 'approved'
+                shopIsVerified(detail.vendor)
                   ? `${detail.vendor.shop_name}, verified shop. View shop`
                   : `${detail.vendor.shop_name}. View shop`
               }
@@ -161,7 +162,7 @@ export default function ProductScreen() {
                   <Text numberOfLines={1} style={[typography.bodyMedium, { flexShrink: 1 }]}>
                     {detail.vendor.shop_name}
                   </Text>
-                  {detail.vendor.status === 'approved' ? <VerifiedMark /> : null}
+                  {shopIsVerified(detail.vendor) ? <VerifiedMark /> : null}
                 </View>
                 <Text style={[typography.caption, { color: colors.lilac }]}>View shop</Text>
               </View>

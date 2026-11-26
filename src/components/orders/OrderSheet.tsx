@@ -17,9 +17,12 @@ import { InlineError } from '@/components/ui/InlineError';
 import { TextField } from '@/components/ui/TextField';
 import { colors, layout, radius, spacing, typography } from '@/constants/theme';
 import { usePlaceOrder } from '@/hooks/queries/useOrders';
+import { usePaymentTerms } from '@/hooks/queries/usePayments';
 import { useVendorProducts } from '@/hooks/queries/useProducts';
+import { useVendor } from '@/hooks/queries/useVendors';
+import type { CheckoutPaymentMethod, OrderSummary } from '@/lib/api/orders';
 import { toFriendlyError } from '@/lib/errors';
-import type { OrderSummary } from '@/lib/api/orders';
+import { formatPrice } from '@/lib/format';
 import { useThemeMode } from '@/lib/themeMode';
 
 export type SheetLine = {
@@ -41,29 +44,43 @@ export function OrderSheet({ visible, vendorId, items: initialItems, onClose, on
   useThemeMode();
   const insets = useSafeAreaInsets();
   const place = usePlaceOrder();
+  const shop = useVendor(vendorId);
+  const terms = usePaymentTerms(visible);
   const [lines, setLines] = useState(initialItems);
   const [meetingPoint, setMeetingPoint] = useState('');
   const [note, setNote] = useState('');
   const [catalog, setCatalog] = useState(false);
+  const [choice, setChoice] = useState<CheckoutPaymentMethod>('cash_on_delivery');
   const [formError, setFormError] = useState<string | null>(null);
   const products = useVendorProducts(vendorId, 'public', visible && catalog);
   const available = (products.data ?? []).filter(
     (row) => row.product.is_available && !lines.some((line) => line.productId === row.product.id),
   );
   const total = lines.reduce((sum, line) => sum + line.unitPrice * line.quantity, 0);
+  const minimum = terms.data?.minOnlineOrderGhs ?? null;
+  const shopReady = shop.data != null && shop.data.status === 'approved' && !shop.data.is_paused;
+  const belowMinimum = minimum != null && Math.round(total * 100) < Math.round(minimum * 100);
+  let payOnlineReason: string | null = null;
+  if (shop.isPending) payOnlineReason = 'Checking whether this shop can take online payments.';
+  else if (!shopReady) payOnlineReason = 'This shop is not ready for online payments.';
+  else if (terms.isPending) payOnlineReason = 'Checking the minimum for online payment.';
+  else if (terms.isError || minimum == null) payOnlineReason = 'Online payments are not ready yet.';
+  else if (belowMinimum) payOnlineReason = `Online orders must be at least ${formatPrice(minimum)}.`;
+  const payOnline = payOnlineReason == null && choice === 'paystack';
 
   function reset() {
     setLines(initialItems);
     setMeetingPoint('');
     setNote('');
     setCatalog(false);
+    setChoice('cash_on_delivery');
     setFormError(null);
   }
 
   function submit() {
     setFormError(null);
     place.mutate(
-      { vendorId, items: lines, meetingPoint, note },
+      { vendorId, items: lines, meetingPoint, note, paymentMethod: payOnline ? 'paystack' : 'cash_on_delivery' },
       {
         onSuccess: (order) => {
           onPlaced(order);
@@ -179,9 +196,21 @@ export function OrderSheet({ visible, vendorId, items: initialItems, onClose, on
                 <Text style={typography.bodyMedium}>Total</Text>
                 <PriceText amount={total} />
               </View>
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Text style={typography.body}>Cash on delivery</Text>
-                <Text style={[typography.caption, { color: colors.textMuted }]}>Pay when you meet</Text>
+              <View style={{ gap: spacing.sm }}>
+                <PayChoice
+                  detail="Pay when you meet"
+                  label="Cash on delivery"
+                  onPress={() => setChoice('cash_on_delivery')}
+                  selected={!payOnline}
+                />
+                <PayChoice
+                  detail="You pay after the vendor accepts your order."
+                  disabled={payOnlineReason != null}
+                  label="Pay online (mobile money or card)"
+                  onPress={() => setChoice('paystack')}
+                  selected={payOnline}
+                />
+                {payOnlineReason ? <Text style={typography.bodySmall}>{payOnlineReason}</Text> : null}
               </View>
               {formError ? <InlineError message={formError} /> : null}
             </ScrollView>
@@ -190,5 +219,41 @@ export function OrderSheet({ visible, vendorId, items: initialItems, onClose, on
         </View>
       </KeyboardAvoidingView>
     </Modal>
+  );
+}
+
+function PayChoice({
+  label,
+  detail,
+  selected,
+  disabled = false,
+  onPress,
+}: {
+  label: string;
+  detail: string;
+  selected: boolean;
+  disabled?: boolean;
+  onPress: () => void;
+}) {
+  useThemeMode();
+  return (
+    <Pressable
+      accessibilityRole="radio"
+      accessibilityState={{ selected, disabled }}
+      disabled={disabled}
+      onPress={onPress}
+      style={{
+        minHeight: layout.minTouchTarget,
+        justifyContent: 'center',
+        padding: spacing.sm,
+        borderRadius: radius.lg,
+        borderWidth: layout.borderWidth,
+        borderColor: selected ? colors.primary : colors.border,
+        gap: spacing.xxs,
+      }}
+    >
+      <Text style={[typography.bodyMedium, disabled ? { color: colors.textMuted } : null]}>{label}</Text>
+      <Text style={typography.bodySmall}>{detail}</Text>
+    </Pressable>
   );
 }

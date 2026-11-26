@@ -1,6 +1,8 @@
 import type { Database } from '../../types/database.types';
 
 export type DbOrderStatus = Database['public']['Enums']['order_status'];
+export type DbPaymentMethod = Database['public']['Enums']['payment_method'];
+export type DbPaymentStatus = Database['public']['Enums']['payment_status'];
 
 /** Values accepted by `StatusPill`. */
 export type OrderPillStatus = 'pending' | 'preparing' | 'ready' | 'completed' | 'declined' | 'cancelled';
@@ -79,6 +81,37 @@ export const actionStatus: Record<OrderAction, DbOrderStatus> = {
   complete: 'completed',
   cancel: 'cancelled',
 };
+
+export function orderPaymentLabel(method: DbPaymentMethod, status: DbPaymentStatus): string {
+  if (method === 'cash_on_delivery' && status === 'unpaid') return 'Cash on delivery';
+  switch (status) {
+    case 'unpaid':
+      return 'Awaiting payment';
+    case 'pending':
+      return 'Confirming payment';
+    case 'paid':
+      return 'Paid';
+    case 'failed':
+      return 'Payment failed';
+    case 'refund_pending':
+      return 'Refund pending';
+    case 'refunded':
+      return 'Refunded';
+    default: {
+      const unreachable: never = status;
+      return unreachable;
+    }
+  }
+}
+
+export function cardPaymentLabel(method: DbPaymentMethod, status: DbPaymentStatus): string | null {
+  if (method === 'cash_on_delivery') return 'COD';
+  if (method !== 'paystack') return null;
+  if (status === 'paid') return 'Paid';
+  if (status === 'refund_pending') return 'Refund pending';
+  if (status === 'refunded') return 'Refunded';
+  return 'Awaiting payment';
+}
 
 export function statusesForFilter(filter: OrderListFilter): readonly DbOrderStatus[] | null {
   if (filter === 'all') return null;

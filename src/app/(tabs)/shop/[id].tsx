@@ -24,6 +24,7 @@ import { useAuth } from '@/lib/auth';
 import { toFriendlyError } from '@/lib/errors';
 import { getImageUrl } from '@/lib/images';
 import { useThemeMode } from '@/lib/themeMode';
+import { shopIsVerified } from '@/lib/verification';
 
 function param(value: string | string[] | undefined): string {
   return Array.isArray(value) ? (value[0] ?? '') : (value ?? '');
@@ -175,22 +176,38 @@ export default function ShopScreen() {
                 <Avatar name={vendor.shop_name} size="lg" uri={getImageUrl('shop-logos', vendor.logo_url)} />
               </View>
             </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-              <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
-                <Text numberOfLines={2} style={[typography.h1, { flexShrink: 1 }]}>
-                  {vendor.shop_name}
-                </Text>
-                {vendor.status === 'approved' ? <VerifiedMark /> : null}
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
+              <Text numberOfLines={2} style={[typography.h1, { flexShrink: 1 }]}>
+                {vendor.shop_name}
+              </Text>
+              {shopIsVerified(vendor) ? <VerifiedMark /> : null}
+            </View>
+            <View style={{ flexDirection: 'row', gap: spacing.sm }}>
+              <View style={{ flex: 1 }}>
+                <Button
+                  disabled={blocked || chat.isPending}
+                  label="Message"
+                  loading={chat.isPending}
+                  onPress={messageShop}
+                  size="md"
+                  variant="outline"
+                />
               </View>
-              <Button
-                disabled={blocked || chat.isPending}
-                fullWidth={false}
-                label="Message"
-                loading={chat.isPending}
-                onPress={messageShop}
-                size="md"
-                variant="outline"
-              />
+              {blocked ? null : (
+                <View style={{ flex: 1 }}>
+                  <Button
+                    label="Request"
+                    onPress={() =>
+                      router.push({
+                        pathname: '/requests',
+                        params: { vendorId, shopName: vendor.shop_name },
+                      })
+                    }
+                    size="md"
+                    variant="secondary"
+                  />
+                </View>
+              )}
             </View>
             {ownsShop ? <Text style={typography.body}>This is your listing</Text> : null}
             {vendor.description ? <Text style={typography.body}>{vendor.description}</Text> : null}

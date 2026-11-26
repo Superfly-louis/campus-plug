@@ -29,6 +29,15 @@ export const queryKeys = {
     all: ['messages'] as const,
     thread: (conversationId: string) => ['messages', 'thread', conversationId] as const,
   },
+  requests: {
+    all: ['requests'] as const,
+    mine: (userId: string) => ['requests', 'mine', userId] as const,
+    campus: (userId: string, categoryId: string | null) =>
+      ['requests', 'campus', userId, categoryId] as const,
+    detail: (id: string) => ['requests', 'detail', id] as const,
+    offers: (id: string) => ['requests', 'offers', id] as const,
+    shops: (userId: string) => ['requests', 'shops', userId] as const,
+  },
   reviews: {
     all: ['reviews'] as const,
     summaries: ['reviews', 'summaries'] as const,
@@ -41,6 +50,20 @@ export const queryKeys = {
       ['orders', 'list', userId, role, filter] as const,
     detail: (id: string) => ['orders', 'detail', id] as const,
     incomingPending: (userId: string) => ['orders', 'incoming-pending', userId] as const,
+  },
+  payments: {
+    all: ['payments'] as const,
+    latest: (orderId: string) => ['payments', 'latest', orderId] as const,
+    terms: ['payments', 'terms'] as const,
+  },
+  charges: {
+    all: ['charges'] as const,
+    vendor: (vendorId: string) => ['charges', 'vendor', vendorId] as const,
+  },
+  payout: {
+    all: ['payout'] as const,
+    status: ['payout', 'status'] as const,
+    banks: ['payout', 'banks'] as const,
   },
   notifications: {
     all: ['notifications'] as const,
